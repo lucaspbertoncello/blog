@@ -13,20 +13,20 @@ type EventType<TRoute extends Route> = TRoute extends "public"
   ? APIGatewayProxyEventV2
   : APIGatewayProxyEventV2WithJWTAuthorizer;
 
-type AdapterFn<TBody> = (params: HandlerParams) => Promise<HandlerResponse<TBody>>;
+type AdapterFn<TParams, TResponse> = (params: HandlerParams<TParams>) => Promise<HandlerResponse<TResponse>>;
 
 type AdapterOptions = {
   schema?: ZodType;
 };
 
-export function lambdaHttpAdapter<TRoute extends Route, TBody = undefined>(
-  fn: AdapterFn<TBody>,
+export function lambdaHttpAdapter<TRoute extends Route, TParams = undefined, TResponse = undefined>(
+  fn: AdapterFn<TParams, TResponse>,
   options?: AdapterOptions,
 ) {
   return async (event: EventType<TRoute>): Promise<APIGatewayProxyResultV2> => {
     try {
       const rawBody = bodyParser(event.body);
-      const body = options?.schema ? options.schema.parse(rawBody) : rawBody;
+      const body: TParams = options?.schema ? options.schema.parse(rawBody) : rawBody;
       const params = event.pathParameters ?? {};
       const queryParams = event.queryStringParameters ?? {};
 

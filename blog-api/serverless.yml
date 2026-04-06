@@ -7,6 +7,9 @@ provider:
   architecture: arm64
   region: us-east-1
   stage: ${opt:stage, 'dev'}
+  environment:
+    COGNITO_USER_POOL_ID: !Ref CognitoUserPool
+    COGNITO_CLIENT_ID: !Ref CognitoUserPoolClient
 
 package:
   individually: true
@@ -18,9 +21,7 @@ custom:
     sourcemap: false
 
 functions:
-  hello:
-    handler: src/hello.handler
-    events:
-      - httpApi:
-          method: GET
-          path: /hello
+  - ${file(./sls/functions/auth.yml)}
+
+resources:
+  - ${file(./sls/resources/cognito.yml)}

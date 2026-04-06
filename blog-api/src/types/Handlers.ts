@@ -1,5 +1,5 @@
-export type HandlerParams = {
-  body: Record<string, unknown>;
+export type HandlerParams<TParams> = {
+  body: TParams;
   params: Record<string, unknown>;
   queryParams: Record<string, unknown>;
 };

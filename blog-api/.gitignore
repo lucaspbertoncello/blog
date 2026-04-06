@@ -2,5 +2,6 @@
 .env
 .claude
 AGENT.md
+CLAUDE.md
 node_modules
 .serverless
