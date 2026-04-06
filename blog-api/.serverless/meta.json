@@ -31,6 +31,12 @@
                 "LogGroupName": "/aws/lambda/blog-api-dev-signup"
               }
             },
+            "ConfirmCodeLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/blog-api-dev-confirmCode"
+              }
+            },
             "IamRoleLambdaExecution": {
               "Type": "AWS::IAM::Role",
               "Properties": {
@@ -114,7 +120,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-us-east-1-6c89fcd1-3dd8",
-                  "S3Key": "serverless/blog-api/dev/1775507579454-2026-04-06T20:32:59.454Z/blog-api-signup.zip"
+                  "S3Key": "serverless/blog-api/dev/1775513325595-2026-04-06T22:08:45.595Z/blog-api-signup.zip"
                 },
                 "Handler": "src/functions/auth/signup.handler",
                 "Runtime": "nodejs22.x",
@@ -146,14 +152,61 @@
                 "SignupLogGroup"
               ]
             },
-            "SignupLambdaVersionDgEKWw4XidTeF1Ztf2mH8p9wIYJeRpKGMaoHEhiw": {
+            "ConfirmCodeLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-us-east-1-6c89fcd1-3dd8",
+                  "S3Key": "serverless/blog-api/dev/1775513325595-2026-04-06T22:08:45.595Z/blog-api-confirmCode.zip"
+                },
+                "Handler": "src/functions/auth/confirmCode.handler",
+                "Runtime": "nodejs22.x",
+                "FunctionName": "blog-api-dev-confirmCode",
+                "MemorySize": 1024,
+                "Timeout": 6,
+                "Architectures": [
+                  "arm64"
+                ],
+                "Environment": {
+                  "Variables": {
+                    "COGNITO_USER_POOL_ID": {
+                      "Ref": "CognitoUserPool"
+                    },
+                    "COGNITO_CLIENT_ID": {
+                      "Ref": "CognitoUserPoolClient"
+                    },
+                    "NODE_OPTIONS": "--enable-source-maps"
+                  }
+                },
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                }
+              },
+              "DependsOn": [
+                "ConfirmCodeLogGroup"
+              ]
+            },
+            "SignupLambdaVersionVQvhWXDqLwZs91BBbz5yjmeMWidcT0lWYo3Bez1liuk": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "SignupLambdaFunction"
                 },
-                "CodeSha256": "4pqpJt685Zj3LNDO5wAfYhrSxxxLpdj/V6+451XR9b8="
+                "CodeSha256": "0gw/9VF5BfBDkXGjDqPrtCYLNRq4pgiV8i7q3KHHdGk="
+              }
+            },
+            "ConfirmCodeLambdaVersionkptIlF8rxckjHlukFohmU9fdmDJKu0ZCOlpgsjmUnCg": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "ConfirmCodeLambdaFunction"
+                },
+                "CodeSha256": "AEfhIgXU6gEdHbBpD/tnOhPs3Yi+G2VASaiNcZX9vKE="
               }
             },
             "HttpApi": {
@@ -251,6 +304,81 @@
               },
               "DependsOn": "HttpApiIntegrationSignup"
             },
+            "ConfirmCodeLambdaPermissionHttpApi": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "ConfirmCodeLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "HttpApi"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "HttpApiIntegrationConfirmCode": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::GetAtt": [
+                    "ConfirmCodeLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "PayloadFormatVersion": "2.0",
+                "TimeoutInMillis": 30000
+              }
+            },
+            "HttpApiRoutePostAuthConfirmDashcode": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "RouteKey": "POST /auth/confirm-code",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "HttpApiIntegrationConfirmCode"
+                      }
+                    ]
+                  ]
+                }
+              },
+              "DependsOn": "HttpApiIntegrationConfirmCode"
+            },
             "CognitoUserPool": {
               "Type": "AWS::Cognito::UserPool",
               "Properties": {
@@ -294,10 +422,19 @@
             "SignupLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "SignupLambdaVersionDgEKWw4XidTeF1Ztf2mH8p9wIYJeRpKGMaoHEhiw"
+                "Ref": "SignupLambdaVersionVQvhWXDqLwZs91BBbz5yjmeMWidcT0lWYo3Bez1liuk"
               },
               "Export": {
                 "Name": "sls-blog-api-dev-SignupLambdaFunctionQualifiedArn"
+              }
+            },
+            "ConfirmCodeLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "ConfirmCodeLambdaVersionkptIlF8rxckjHlukFohmU9fdmDJKu0ZCOlpgsjmUnCg"
+              },
+              "Export": {
+                "Name": "sls-blog-api-dev-ConfirmCodeLambdaFunctionQualifiedArn"
               }
             },
             "HttpApiId": {
@@ -342,7 +479,7 @@
         "individually": true,
         "artifactsS3KeyDirname": "serverless/blog-api/dev/code-artifacts",
         "deploymentBucket": "serverless-framework-deployments-us-east-1-6c89fcd1-3dd8",
-        "artifactDirectoryName": "serverless/blog-api/dev/1775507579454-2026-04-06T20:32:59.454Z"
+        "artifactDirectoryName": "serverless/blog-api/dev/1775513325595-2026-04-06T22:08:45.595Z"
       },
       "custom": {
         "esbuild": {
@@ -375,7 +512,32 @@
           "timeout": 6,
           "runtime": "nodejs22.x",
           "vpc": {},
-          "versionLogicalId": "SignupLambdaVersionDgEKWw4XidTeF1Ztf2mH8p9wIYJeRpKGMaoHEhiw"
+          "versionLogicalId": "SignupLambdaVersionVQvhWXDqLwZs91BBbz5yjmeMWidcT0lWYo3Bez1liuk"
+        },
+        "confirmCode": {
+          "handler": "src/functions/auth/confirmCode.handler",
+          "events": [
+            {
+              "httpApi": {
+                "method": "POST",
+                "path": "/auth/confirm-code"
+              },
+              "resolvedMethod": "POST",
+              "resolvedPath": "/auth/confirm-code"
+            }
+          ],
+          "name": "blog-api-dev-confirmCode",
+          "environment": {
+            "NODE_OPTIONS": "--enable-source-maps"
+          },
+          "package": {
+            "artifact": "C:\\Programming\\projects\\blog\\blog-api\\.serverless\\build\\blog-api-confirmCode.zip"
+          },
+          "memory": 1024,
+          "timeout": 6,
+          "runtime": "nodejs22.x",
+          "vpc": {},
+          "versionLogicalId": "ConfirmCodeLambdaVersionkptIlF8rxckjHlukFohmU9fdmDJKu0ZCOlpgsjmUnCg"
         }
       },
       "resources": {
@@ -439,6 +601,12 @@
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
               "LogGroupName": "/aws/lambda/blog-api-dev-signup"
+            }
+          },
+          "ConfirmCodeLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/blog-api-dev-confirmCode"
             }
           },
           "IamRoleLambdaExecution": {
@@ -524,7 +692,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-us-east-1-6c89fcd1-3dd8",
-                "S3Key": "serverless/blog-api/dev/1775507579454-2026-04-06T20:32:59.454Z/blog-api-signup.zip"
+                "S3Key": "serverless/blog-api/dev/1775513325595-2026-04-06T22:08:45.595Z/blog-api-signup.zip"
               },
               "Handler": "src/functions/auth/signup.handler",
               "Runtime": "nodejs22.x",
@@ -556,14 +724,61 @@
               "SignupLogGroup"
             ]
           },
-          "SignupLambdaVersionDgEKWw4XidTeF1Ztf2mH8p9wIYJeRpKGMaoHEhiw": {
+          "ConfirmCodeLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-1-6c89fcd1-3dd8",
+                "S3Key": "serverless/blog-api/dev/1775513325595-2026-04-06T22:08:45.595Z/blog-api-confirmCode.zip"
+              },
+              "Handler": "src/functions/auth/confirmCode.handler",
+              "Runtime": "nodejs22.x",
+              "FunctionName": "blog-api-dev-confirmCode",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Architectures": [
+                "arm64"
+              ],
+              "Environment": {
+                "Variables": {
+                  "COGNITO_USER_POOL_ID": {
+                    "Ref": "CognitoUserPool"
+                  },
+                  "COGNITO_CLIENT_ID": {
+                    "Ref": "CognitoUserPoolClient"
+                  },
+                  "NODE_OPTIONS": "--enable-source-maps"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "ConfirmCodeLogGroup"
+            ]
+          },
+          "SignupLambdaVersionVQvhWXDqLwZs91BBbz5yjmeMWidcT0lWYo3Bez1liuk": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "SignupLambdaFunction"
               },
-              "CodeSha256": "4pqpJt685Zj3LNDO5wAfYhrSxxxLpdj/V6+451XR9b8="
+              "CodeSha256": "0gw/9VF5BfBDkXGjDqPrtCYLNRq4pgiV8i7q3KHHdGk="
+            }
+          },
+          "ConfirmCodeLambdaVersionkptIlF8rxckjHlukFohmU9fdmDJKu0ZCOlpgsjmUnCg": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ConfirmCodeLambdaFunction"
+              },
+              "CodeSha256": "AEfhIgXU6gEdHbBpD/tnOhPs3Yi+G2VASaiNcZX9vKE="
             }
           },
           "HttpApi": {
@@ -661,6 +876,81 @@
             },
             "DependsOn": "HttpApiIntegrationSignup"
           },
+          "ConfirmCodeLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ConfirmCodeLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationConfirmCode": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::GetAtt": [
+                  "ConfirmCodeLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRoutePostAuthConfirmDashcode": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "POST /auth/confirm-code",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationConfirmCode"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationConfirmCode"
+          },
           "CognitoUserPool": {
             "Type": "AWS::Cognito::UserPool",
             "Properties": {
@@ -704,10 +994,19 @@
           "SignupLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "SignupLambdaVersionDgEKWw4XidTeF1Ztf2mH8p9wIYJeRpKGMaoHEhiw"
+              "Ref": "SignupLambdaVersionVQvhWXDqLwZs91BBbz5yjmeMWidcT0lWYo3Bez1liuk"
             },
             "Export": {
               "Name": "sls-blog-api-dev-SignupLambdaFunctionQualifiedArn"
+            }
+          },
+          "ConfirmCodeLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ConfirmCodeLambdaVersionkptIlF8rxckjHlukFohmU9fdmDJKu0ZCOlpgsjmUnCg"
+            },
+            "Export": {
+              "Name": "sls-blog-api-dev-ConfirmCodeLambdaFunctionQualifiedArn"
             }
           },
           "HttpApiId": {
@@ -770,12 +1069,18 @@
     "serviceProviderAwsCfStackName": "blog-api-dev",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:214882930100:stack/blog-api-dev/1aa296c0-314a-11f1-97c8-0e67be561701",
     "serviceProviderAwsCfStackCreated": "2026-04-05T23:49:37.115Z",
-    "serviceProviderAwsCfStackUpdated": "2026-04-06T19:44:56.098Z",
+    "serviceProviderAwsCfStackUpdated": "2026-04-06T22:04:25.577Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
+        "OutputKey": "ConfirmCodeLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:214882930100:function:blog-api-dev-confirmCode:3",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-blog-api-dev-ConfirmCodeLambdaFunctionQualifiedArn"
+      },
+      {
         "OutputKey": "SignupLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:us-east-1:214882930100:function:blog-api-dev-signup:4",
+        "OutputValue": "arn:aws:lambda:us-east-1:214882930100:function:blog-api-dev-signup:8",
         "Description": "Current Lambda function version",
         "ExportName": "sls-blog-api-dev-SignupLambdaFunctionQualifiedArn"
       },
@@ -805,6 +1110,12 @@
           "Type": "AWS::Logs::LogGroup",
           "Properties": {
             "LogGroupName": "/aws/lambda/blog-api-dev-signup"
+          }
+        },
+        "ConfirmCodeLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/blog-api-dev-confirmCode"
           }
         },
         "IamRoleLambdaExecution": {
@@ -890,7 +1201,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-us-east-1-6c89fcd1-3dd8",
-              "S3Key": "serverless/blog-api/dev/1775507579454-2026-04-06T20:32:59.454Z/blog-api-signup.zip"
+              "S3Key": "serverless/blog-api/dev/1775513325595-2026-04-06T22:08:45.595Z/blog-api-signup.zip"
             },
             "Handler": "src/functions/auth/signup.handler",
             "Runtime": "nodejs22.x",
@@ -922,14 +1233,61 @@
             "SignupLogGroup"
           ]
         },
-        "SignupLambdaVersionDgEKWw4XidTeF1Ztf2mH8p9wIYJeRpKGMaoHEhiw": {
+        "ConfirmCodeLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "serverless-framework-deployments-us-east-1-6c89fcd1-3dd8",
+              "S3Key": "serverless/blog-api/dev/1775513325595-2026-04-06T22:08:45.595Z/blog-api-confirmCode.zip"
+            },
+            "Handler": "src/functions/auth/confirmCode.handler",
+            "Runtime": "nodejs22.x",
+            "FunctionName": "blog-api-dev-confirmCode",
+            "MemorySize": 1024,
+            "Timeout": 6,
+            "Architectures": [
+              "arm64"
+            ],
+            "Environment": {
+              "Variables": {
+                "COGNITO_USER_POOL_ID": {
+                  "Ref": "CognitoUserPool"
+                },
+                "COGNITO_CLIENT_ID": {
+                  "Ref": "CognitoUserPoolClient"
+                },
+                "NODE_OPTIONS": "--enable-source-maps"
+              }
+            },
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            }
+          },
+          "DependsOn": [
+            "ConfirmCodeLogGroup"
+          ]
+        },
+        "SignupLambdaVersionVQvhWXDqLwZs91BBbz5yjmeMWidcT0lWYo3Bez1liuk": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "SignupLambdaFunction"
             },
-            "CodeSha256": "4pqpJt685Zj3LNDO5wAfYhrSxxxLpdj/V6+451XR9b8="
+            "CodeSha256": "0gw/9VF5BfBDkXGjDqPrtCYLNRq4pgiV8i7q3KHHdGk="
+          }
+        },
+        "ConfirmCodeLambdaVersionkptIlF8rxckjHlukFohmU9fdmDJKu0ZCOlpgsjmUnCg": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "ConfirmCodeLambdaFunction"
+            },
+            "CodeSha256": "AEfhIgXU6gEdHbBpD/tnOhPs3Yi+G2VASaiNcZX9vKE="
           }
         },
         "HttpApi": {
@@ -1027,6 +1385,81 @@
           },
           "DependsOn": "HttpApiIntegrationSignup"
         },
+        "ConfirmCodeLambdaPermissionHttpApi": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "ConfirmCodeLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "HttpApi"
+                  },
+                  "/*"
+                ]
+              ]
+            }
+          }
+        },
+        "HttpApiIntegrationConfirmCode": {
+          "Type": "AWS::ApiGatewayV2::Integration",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "IntegrationType": "AWS_PROXY",
+            "IntegrationUri": {
+              "Fn::GetAtt": [
+                "ConfirmCodeLambdaFunction",
+                "Arn"
+              ]
+            },
+            "PayloadFormatVersion": "2.0",
+            "TimeoutInMillis": 30000
+          }
+        },
+        "HttpApiRoutePostAuthConfirmDashcode": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "RouteKey": "POST /auth/confirm-code",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "HttpApiIntegrationConfirmCode"
+                  }
+                ]
+              ]
+            }
+          },
+          "DependsOn": "HttpApiIntegrationConfirmCode"
+        },
         "CognitoUserPool": {
           "Type": "AWS::Cognito::UserPool",
           "Properties": {
@@ -1070,10 +1503,19 @@
         "SignupLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "SignupLambdaVersionDgEKWw4XidTeF1Ztf2mH8p9wIYJeRpKGMaoHEhiw"
+            "Ref": "SignupLambdaVersionVQvhWXDqLwZs91BBbz5yjmeMWidcT0lWYo3Bez1liuk"
           },
           "Export": {
             "Name": "sls-blog-api-dev-SignupLambdaFunctionQualifiedArn"
+          }
+        },
+        "ConfirmCodeLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "ConfirmCodeLambdaVersionkptIlF8rxckjHlukFohmU9fdmDJKu0ZCOlpgsjmUnCg"
+          },
+          "Export": {
+            "Name": "sls-blog-api-dev-ConfirmCodeLambdaFunctionQualifiedArn"
           }
         },
         "HttpApiId": {

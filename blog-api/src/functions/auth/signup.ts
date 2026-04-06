@@ -3,10 +3,11 @@ import { lambdaHttpAdapter } from "../../adapters/lambdaHttpAdapter";
 import { SignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { cognitoClient } from "../../clients/cognitoClient";
 import { ApplicationError } from "../../errors/ApplicationError";
+import { cognitoErrorMapper } from "../../errors/mappers/cognitoErrorMapper";
 
 const schema = z.object({
-  email: z.email({ error: "Invalid email address" }),
-  password: z.string({ error: "Password is required" }).min(8),
+  email: z.email({ error: "E-mail inválido" }),
+  password: z.string({ error: "Senha inválida" }).min(8),
 });
 
 export const handler = lambdaHttpAdapter<"public", Signup.Params, Signup.Response>(
@@ -25,7 +26,7 @@ export const handler = lambdaHttpAdapter<"public", Signup.Params, Signup.Respons
 
     return { body: { codeDeliveryMessage: CodeDeliveryDetails?.Destination }, statusCode: 200 };
   },
-  { schema },
+  { schema, errorMapper: cognitoErrorMapper },
 );
 
 export namespace Signup {

@@ -4,3 +4,10 @@ signup:
     - httpApi:
         method: POST
         path: /auth/signup
+
+confirmCode:
+  handler: src/functions/auth/confirmCode.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /auth/confirm-code
