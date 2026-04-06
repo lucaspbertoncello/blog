@@ -3,3 +3,4 @@
 .claude
 AGENT.md
 node_modules
+.serverless
