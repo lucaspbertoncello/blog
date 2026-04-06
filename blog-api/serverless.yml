@@ -1,0 +1,26 @@
+org: moullxndev
+service: blog-api
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  architecture: arm64
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+
+package:
+  individually: true
+
+custom:
+  esbuild:
+    bundle: true
+    minify: true
+    sourcemap: false
+
+functions:
+  hello:
+    handler: src/hello.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /hello

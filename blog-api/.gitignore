@@ -1,0 +1,5 @@
+.vscode
+.env
+.claude
+AGENT.md
+node_modules
