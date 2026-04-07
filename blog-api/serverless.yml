@@ -7,6 +7,15 @@ provider:
   architecture: arm64
   region: us-east-1
   stage: ${opt:stage, 'dev'}
+  httpApi:
+    authorizers:
+      jwtAuthorizer:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: !GetAtt CognitoUserPool.ProviderURL
+        audience:
+          - !Ref CognitoUserPoolClient
+
   environment:
     COGNITO_USER_POOL_ID: !Ref CognitoUserPool
     COGNITO_CLIENT_ID: !Ref CognitoUserPoolClient
@@ -34,7 +43,8 @@ custom:
     sourcemap: false
 
 functions:
-  - ${file(./sls/functions/auth.yml)}
+  - ${file(./sls/functions/Auth.yml)}
+  - ${file(./sls/functions/Users.yml)}
 
 resources:
   - ${file(./sls/resources/UserPool.yml)}
