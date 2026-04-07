@@ -10,6 +10,19 @@ provider:
   environment:
     COGNITO_USER_POOL_ID: !Ref CognitoUserPool
     COGNITO_CLIENT_ID: !Ref CognitoUserPoolClient
+    TABLE_NAME: blog-${self:provider.stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:Query
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+          Resource:
+            - !GetAtt MainTable.Arn
+            - !Sub "${MainTable.Arn}/index/*"
 
 package:
   individually: true
@@ -24,4 +37,5 @@ functions:
   - ${file(./sls/functions/auth.yml)}
 
 resources:
-  - ${file(./sls/resources/cognito.yml)}
+  - ${file(./sls/resources/UserPool.yml)}
+  - ${file(./sls/resources/MainTable.yml)}

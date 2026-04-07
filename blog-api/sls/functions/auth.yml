@@ -18,3 +18,12 @@ signin:
     - httpApi:
         method: POST
         path: /auth/signin
+
+postConfirmation:
+  handler: src/functions/auth/postConfirmation.handler
+  events:
+    - cognitoUserPool:
+        pool: blog-user-pool-${self:provider.stage}
+        trigger: PostConfirmation
+        forceDeploy: true
+        existing: true
