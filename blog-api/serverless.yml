@@ -45,6 +45,7 @@ custom:
 functions:
   - ${file(./sls/functions/Auth.yml)}
   - ${file(./sls/functions/Users.yml)}
+  - ${file(./sls/functions/Articles.yml)}
 
 resources:
   - ${file(./sls/resources/UserPool.yml)}

@@ -1,0 +1,8 @@
+createArticle:
+  handler: src/functions/articles/createArticle.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /articles
+        authorizer:
+          name: jwtAuthorizer
