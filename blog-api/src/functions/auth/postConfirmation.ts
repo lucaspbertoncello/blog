@@ -25,8 +25,7 @@ export const handler = async (event: PostConfirmationTriggerEvent) => {
     },
   });
 
-  const response = await dynamoClient.send(command);
-  console.log(response);
+  await dynamoClient.send(command);
 
   return event;
 };

@@ -17,14 +17,6 @@ Resources:
           RequireNumbers: false
           RequireSymbols: false
       LambdaConfig:
-        PostConfirmation:
-          Fn::Join:
-            - ""
-            - - "arn:aws:lambda:"
-              - !Ref "AWS::Region"
-              - ":"
-              - !Ref "AWS::AccountId"
-              - ":function:${self:service}-${self:provider.stage}-postConfirmation"
         PreTokenGenerationConfig:
           LambdaArn:
             Fn::Join:
@@ -35,14 +27,6 @@ Resources:
                 - !Ref "AWS::AccountId"
                 - ":function:${self:service}-${self:provider.stage}-preTokenGeneration"
           LambdaVersion: V2_0
-
-  CognitoPostConfirmationPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !GetAtt PostConfirmationLambdaFunction.Arn
-      Principal: cognito-idp.amazonaws.com
-      SourceArn: !GetAtt CognitoUserPool.Arn
 
   CognitoPreTokenGenerationPermission:
     Type: AWS::Lambda::Permission

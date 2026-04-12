@@ -21,6 +21,11 @@ signin:
 
 postConfirmation:
   handler: src/functions/auth/postConfirmation.handler
+  events:
+    - cognitoUserPool:
+        pool: blog-user-pool-${self:provider.stage}
+        trigger: PostConfirmation
+        existing: true
 
 preTokenGeneration:
   handler: src/functions/auth/preTokenGeneration.handler
