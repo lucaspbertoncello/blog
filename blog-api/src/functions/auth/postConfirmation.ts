@@ -14,6 +14,7 @@ export const handler = async (event: PostConfirmationTriggerEvent) => {
       SK: "INFO",
       GSI1PK: `EMAIL#${email}`,
       GSI1SK: `ACCOUNT#${sub}`,
+      GSI2PK: "ACCOUNTS",
       GSI2SK: `CREATED_AT#${now}`,
       accountId: sub,
       email,
