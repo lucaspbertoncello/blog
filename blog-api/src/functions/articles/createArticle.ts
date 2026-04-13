@@ -23,7 +23,7 @@ export const handler = lambdaHttpAdapter<"private", CreateArticle.Params, Create
       Item: {
         PK: `ARTICLE#${articleId}`,
         SK: "INFO",
-        GSI1PK: `ACCOUNT#${accountId}`,
+        GSI1PK: `SLUG#${body.slug}`,
         GSI1SK: `ARTICLE#${articleId}`,
         GSI2PK: `ARTICLES`,
         GSI2SK: `STATUS#draft#CREATED_AT#${now}`,
