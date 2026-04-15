@@ -21,8 +21,6 @@ export const handler = lambdaHttpAdapter<
 
   const { Items, Count } = await dynamoClient.send(command);
 
-  console.log({ Items, Count, param: params.articleId });
-
   if (!Count || !Items) {
     throw new ApplicationError("Artigo inexistente");
   }
