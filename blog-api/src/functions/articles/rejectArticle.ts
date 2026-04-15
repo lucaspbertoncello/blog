@@ -4,7 +4,7 @@ import { dynamoClient } from "../../clients/dynamoClient";
 import { ApplicationError } from "../../errors/ApplicationError";
 import { dynamoErrorMapper } from "../../errors/mappers/dynamoErrorMapper";
 
-export const handler = lambdaHttpAdapter<"private", undefined, void>(
+export const handler = lambdaHttpAdapter<"private", undefined, void, RejectArticle.UrlParams>(
   async ({ params }) => {
     const articleId = params.articleId;
 
@@ -43,3 +43,7 @@ export const handler = lambdaHttpAdapter<"private", undefined, void>(
   },
   { requiredRoles: ["admin"], errorMapper: dynamoErrorMapper },
 );
+
+export namespace RejectArticle {
+  export type UrlParams = { articleId: string };
+}

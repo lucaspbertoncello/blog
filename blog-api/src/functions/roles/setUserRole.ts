@@ -11,7 +11,7 @@ const schema = z.object({
   }),
 });
 
-export const handler = lambdaHttpAdapter<"private", SetUserRole.Params, void>(
+export const handler = lambdaHttpAdapter<"private", SetUserRole.Params, void, SetUserRole.UrlParams>(
   async ({ body, params }) => {
     const accountId = params.accountId;
 
@@ -46,4 +46,5 @@ export const handler = lambdaHttpAdapter<"private", SetUserRole.Params, void>(
 
 export namespace SetUserRole {
   export type Params = z.infer<typeof schema>;
+  export type UrlParams = { accountId: string };
 }

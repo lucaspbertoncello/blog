@@ -15,7 +15,12 @@ type EventType<TRoute extends Route> = TRoute extends "public"
   ? APIGatewayProxyEventV2
   : APIGatewayProxyEventV2WithJWTAuthorizer;
 
-type AdapterFn<TBody, TResponse> = (params: HandlerParams<TBody>) => Promise<HandlerResponse<TResponse>>;
+type AdapterFn<
+  TBody extends Record<string, any> | undefined,
+  TParams extends Record<string, any> | undefined,
+  TQueryParams extends Record<string, any> | undefined,
+  TResponse,
+> = (params: HandlerParams<TBody, TParams, TQueryParams>) => Promise<HandlerResponse<TResponse>>;
 
 type AdapterOptions = {
   schema?: ZodType;
@@ -23,17 +28,20 @@ type AdapterOptions = {
   requiredRoles?: Role[];
 };
 
-export function lambdaHttpAdapter<TRoute extends Route, TBody = undefined, TResponse = undefined>(
-  fn: AdapterFn<TBody, TResponse>,
-  options?: AdapterOptions,
-) {
+export function lambdaHttpAdapter<
+  TRoute extends Route,
+  TBody extends Record<string, any> | undefined = undefined,
+  TResponse = undefined,
+  TParams extends Record<string, any> | undefined = undefined,
+  TQueryParams extends Record<string, any> | undefined = undefined,
+>(fn: AdapterFn<TBody, TParams, TQueryParams, TResponse>, options?: AdapterOptions) {
   return async (event: EventType<TRoute>): Promise<APIGatewayProxyResultV2> => {
     try {
       const rawBody = bodyParser(event.body);
       const body: TBody = options?.schema ? options.schema.parse(rawBody) : rawBody;
 
-      const params = event.pathParameters ?? {};
-      const queryParams = event.queryStringParameters ?? {};
+      const params = event.pathParameters as TParams;
+      const queryParams = event.queryStringParameters as TQueryParams;
 
       const accountId =
         "authorizer" in event.requestContext
@@ -51,7 +59,13 @@ export function lambdaHttpAdapter<TRoute extends Route, TBody = undefined, TResp
         }
       }
 
-      const result = await fn({ body, params, queryParams, accountId, role });
+      const result = await fn({
+        body,
+        params,
+        queryParams,
+        accountId,
+        role,
+      });
 
       return sendResponse({ statusCode: result.statusCode, body: result.body ?? {} });
     } catch (err) {
