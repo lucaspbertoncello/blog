@@ -46,6 +46,7 @@ functions:
   - ${file(./sls/functions/Auth.yml)}
   - ${file(./sls/functions/Users.yml)}
   - ${file(./sls/functions/Articles.yml)}
+  - ${file(./sls/functions/Roles.yml)}
 
 resources:
   - ${file(./sls/resources/UserPool.yml)}

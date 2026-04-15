@@ -1,0 +1,8 @@
+setUserRole:
+  handler: src/functions/roles/setUserRole.handler
+  events:
+    - httpApi:
+        method: PATCH
+        path: /users/{accountId}/role
+        authorizer:
+          name: jwtAuthorizer
