@@ -4,6 +4,7 @@ import { z } from "zod";
 import { lambdaHttpAdapter } from "../../adapters/lambdaHttpAdapter";
 import { dynamoClient } from "../../clients/dynamoClient";
 import { dynamoErrorMapper } from "../../errors/mappers/dynamoErrorMapper";
+import { ApplicationError } from "../../errors/ApplicationError";
 
 const schema = z.object({
   title: z.string().min(1, "Título é obrigatório"),
@@ -30,7 +31,7 @@ export const handler = lambdaHttpAdapter<"private", CreateArticle.Params, Create
     const { Count } = await dynamoClient.send(slugAlreadyExists);
 
     if (Count) {
-      return { statusCode: 400, body: { message: "Já existe um artigo com esse nome" } };
+      throw new ApplicationError("Já existe um artigo com esse nome");
     }
 
     const command = new PutCommand({
@@ -59,7 +60,6 @@ export const handler = lambdaHttpAdapter<"private", CreateArticle.Params, Create
 
     return {
       statusCode: 201,
-      body: { message: "Artigo salvo com sucesso!" },
     };
   },
   { schema: schema, requiredRoles: ["writer", "admin"], errorMapper: dynamoErrorMapper },
@@ -67,5 +67,5 @@ export const handler = lambdaHttpAdapter<"private", CreateArticle.Params, Create
 
 export namespace CreateArticle {
   export type Params = z.infer<typeof schema>;
-  export type Response = { message: string };
+  export type Response = void;
 }
