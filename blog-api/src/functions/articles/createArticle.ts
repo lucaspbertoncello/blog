@@ -1,4 +1,4 @@
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { randomUUID } from "crypto";
 import { z } from "zod";
 import { lambdaHttpAdapter } from "../../adapters/lambdaHttpAdapter";
@@ -17,6 +17,21 @@ export const handler = lambdaHttpAdapter<"private", CreateArticle.Params, Create
   async ({ body, accountId }) => {
     const articleId = randomUUID();
     const now = new Date().toISOString();
+
+    const slugAlreadyExists = new QueryCommand({
+      TableName: process.env.TABLE_NAME,
+      IndexName: "GSI1",
+      KeyConditionExpression: "GSI1PK = :pk",
+      ExpressionAttributeValues: {
+        ":pk": `SLUG#${body.slug}`,
+      },
+    });
+
+    const { Count } = await dynamoClient.send(slugAlreadyExists);
+
+    if (Count) {
+      return { statusCode: 400, body: { message: "Já existe um artigo com esse nome" } };
+    }
 
     const command = new PutCommand({
       TableName: process.env.TABLE_NAME,
@@ -42,12 +57,15 @@ export const handler = lambdaHttpAdapter<"private", CreateArticle.Params, Create
 
     await dynamoClient.send(command);
 
-    return { statusCode: 201 };
+    return {
+      statusCode: 201,
+      body: { message: "Artigo salvo com sucesso!" },
+    };
   },
   { schema: schema, requiredRoles: ["writer", "admin"], errorMapper: dynamoErrorMapper },
 );
 
 export namespace CreateArticle {
   export type Params = z.infer<typeof schema>;
-  export type Response = void;
+  export type Response = { message: string };
 }
