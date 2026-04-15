@@ -20,7 +20,7 @@ export const handler = lambdaHttpAdapter<"private", undefined, void>(
     }
 
     if (Item.status !== "in_review") {
-      throw new ApplicationError("Apenas artigos em revisão podem ser publicados");
+      throw new ApplicationError("Apenas artigos em revisão podem ser rejeitados");
     }
 
     const now = new Date().toISOString();
@@ -31,8 +31,8 @@ export const handler = lambdaHttpAdapter<"private", undefined, void>(
       UpdateExpression: "SET #status = :status, GSI2SK = :gsi2sk, updatedAt = :updatedAt",
       ExpressionAttributeNames: { "#status": "status" },
       ExpressionAttributeValues: {
-        ":status": "published",
-        ":gsi2sk": `STATUS#published#CREATED_AT#${Item.createdAt}`,
+        ":status": "rejected",
+        ":gsi2sk": `STATUS#rejected#CREATED_AT#${Item.createdAt}`,
         ":updatedAt": now,
       },
     });

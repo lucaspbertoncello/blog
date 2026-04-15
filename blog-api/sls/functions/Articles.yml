@@ -6,3 +6,30 @@ createArticle:
         path: /articles
         authorizer:
           name: jwtAuthorizer
+
+submitArticle:
+  handler: src/functions/articles/submitArticle.handler
+  events:
+    - httpApi:
+        method: PATCH
+        path: /articles/{articleId}/submit
+        authorizer:
+          name: jwtAuthorizer
+
+publishArticle:
+  handler: src/functions/articles/publishArticle.handler
+  events:
+    - httpApi:
+        method: PATCH
+        path: /articles/{articleId}/publish
+        authorizer:
+          name: jwtAuthorizer
+
+rejectArticle:
+  handler: src/functions/articles/rejectArticle.handler
+  events:
+    - httpApi:
+        method: PATCH
+        path: /articles/{articleId}/reject
+        authorizer:
+          name: jwtAuthorizer
