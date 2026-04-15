@@ -24,6 +24,7 @@ type AdapterFn<
 
 type AdapterOptions = {
   schema?: ZodType;
+  querySchema?: ZodType;
   errorMapper?: (err: unknown) => ApplicationError;
   requiredRoles?: Role[];
 };
@@ -41,7 +42,11 @@ export function lambdaHttpAdapter<
       const body: TBody = options?.schema ? options.schema.parse(rawBody) : rawBody;
 
       const params = event.pathParameters as TParams;
-      const queryParams = event.queryStringParameters as TQueryParams;
+
+      const rawQueryParams = event.queryStringParameters as TQueryParams;
+      const queryParams = options?.querySchema
+        ? options.querySchema.parse(rawQueryParams)
+        : (rawQueryParams as TQueryParams);
 
       const accountId =
         "authorizer" in event.requestContext
@@ -62,7 +67,7 @@ export function lambdaHttpAdapter<
       const result = await fn({
         body,
         params,
-        queryParams,
+        queryParams: queryParams as TQueryParams,
         accountId,
         role,
       });

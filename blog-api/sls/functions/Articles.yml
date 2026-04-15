@@ -34,8 +34,8 @@ rejectArticle:
         authorizer:
           name: jwtAuthorizer
 
-listAllArticles:
-  handler: src/functions/articles/listAllArticles.handler
+listArticlesByStatus:
+  handler: src/functions/articles/listArticlesByStatus.handler
   events:
     - httpApi:
         method: GET
