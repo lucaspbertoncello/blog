@@ -34,6 +34,13 @@ rejectArticle:
         authorizer:
           name: jwtAuthorizer
 
+listPublishedArticles:
+  handler: src/functions/articles/listPublishedArticles.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /articles/feed
+
 listArticlesByStatus:
   handler: src/functions/articles/listArticlesByStatus.handler
   events:
