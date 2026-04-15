@@ -40,16 +40,18 @@ export function lambdaHttpAdapter<TRoute extends Route, TParams = undefined, TRe
           ? (event.requestContext.authorizer.jwt.claims.sub as string)
           : null;
 
-      if (options?.requiredRoles?.length) {
-        const jwtEvent = event as APIGatewayProxyEventV2WithJWTAuthorizer;
-        const role = jwtEvent.requestContext.authorizer.jwt.claims["role"] as string;
+      const role =
+        "authorizer" in event.requestContext
+          ? ((event.requestContext.authorizer.jwt.claims["role"] as string) ?? null)
+          : null;
 
-        if (!options.requiredRoles.includes(role as Role)) {
+      if (options?.requiredRoles?.length) {
+        if (!role || !options.requiredRoles.includes(role as Role)) {
           return sendResponse({ statusCode: 403, body: { message: "Acesso negado" } });
         }
       }
 
-      const result = await fn({ body, params, queryParams, accountId });
+      const result = await fn({ body, params, queryParams, accountId, role });
 
       return sendResponse({ statusCode: result.statusCode, body: result.body ?? {} });
     } catch (err) {

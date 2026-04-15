@@ -3,6 +3,7 @@ export type HandlerParams<TParams> = {
   params: Record<string, unknown>;
   queryParams: Record<string, unknown>;
   accountId?: string | null;
+  role?: string | null;
 };
 
 export type HandlerResponse<T = undefined> = {
