@@ -49,3 +49,10 @@ listArticlesByStatus:
         path: /articles
         authorizer:
           name: jwtAuthorizer
+
+getPublicArticleBySlug:
+  handler: src/functions/articles/getPublicArticleBySlug.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /articles/public/{articleId}
