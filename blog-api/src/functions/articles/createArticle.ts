@@ -5,11 +5,11 @@ import { lambdaHttpAdapter } from "../../adapters/lambdaHttpAdapter";
 import { dynamoClient } from "../../clients/dynamoClient";
 import { dynamoErrorMapper } from "../../errors/mappers/dynamoErrorMapper";
 import { ApplicationError } from "../../errors/ApplicationError";
+import { generateSlug } from "../../utils/generateSlug";
 
 const schema = z.object({
   title: z.string().min(1, "Título é obrigatório"),
   content: z.string().min(1, "Conteúdo é obrigatório"),
-  slug: z.string().min(1, "Slug é obrigatório"),
   tags: z.array(z.string({ error: "Tag inválida" }), { error: "Tags devem ser uma lista" }),
   visibility: z.enum(["public", "students_only"], { error: "Visibilidade inválida" }),
 });
@@ -18,20 +18,17 @@ export const handler = lambdaHttpAdapter<"private", CreateArticle.Params, Create
   async ({ body, accountId }) => {
     const articleId = randomUUID();
     const now = new Date().toISOString();
+    const slug = generateSlug(body.title);
 
-    const slugAlreadyExists = new QueryCommand({
+    const { Count } = await dynamoClient.send(new QueryCommand({
       TableName: process.env.TABLE_NAME,
       IndexName: "GSI1",
       KeyConditionExpression: "GSI1PK = :pk",
-      ExpressionAttributeValues: {
-        ":pk": `SLUG#${body.slug}`,
-      },
-    });
-
-    const { Count } = await dynamoClient.send(slugAlreadyExists);
+      ExpressionAttributeValues: { ":pk": `SLUG#${slug}` },
+    }));
 
     if (Count) {
-      throw new ApplicationError("Já existe um artigo com esse nome");
+      throw new ApplicationError("Já existe um artigo com esse título");
     }
 
     const command = new PutCommand({
@@ -39,7 +36,7 @@ export const handler = lambdaHttpAdapter<"private", CreateArticle.Params, Create
       Item: {
         PK: `ARTICLE#${articleId}`,
         SK: "INFO",
-        GSI1PK: `SLUG#${body.slug}`,
+        GSI1PK: `SLUG#${slug}`,
         GSI1SK: `ARTICLE#${articleId}`,
         GSI2PK: `ARTICLES`,
         GSI2SK: `STATUS#draft#CREATED_AT#${now}`,
@@ -48,7 +45,7 @@ export const handler = lambdaHttpAdapter<"private", CreateArticle.Params, Create
         title: body.title,
         content: body.content,
         tags: body.tags,
-        slug: body.slug,
+        slug,
         status: "draft",
         visibility: body.visibility,
         createdAt: now,
