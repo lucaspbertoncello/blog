@@ -33,3 +33,12 @@ rejectArticle:
         path: /articles/{articleId}/reject
         authorizer:
           name: jwtAuthorizer
+
+listAllArticles:
+  handler: src/functions/articles/listAllArticles.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /articles
+        authorizer:
+          name: jwtAuthorizer
