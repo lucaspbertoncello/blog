@@ -7,6 +7,15 @@ createArticle:
         authorizer:
           name: jwtAuthorizer
 
+editArticle:
+  handler: src/functions/articles/editArticle.handler
+  events:
+    - httpApi:
+        method: PATCH
+        path: /articles/{articleId}
+        authorizer:
+          name: jwtAuthorizer
+
 submitArticle:
   handler: src/functions/articles/submitArticle.handler
   events:
