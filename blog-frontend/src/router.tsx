@@ -2,6 +2,7 @@ import { createRouter, createRoute, createRootRoute, Outlet } from "@tanstack/re
 import { TanStackRouterDevtools } from "@tanstack/router-devtools"
 import { SigninView } from "./features/auth/signin/SigninView"
 import { SignupView } from "./features/auth/signup/SignupView"
+import { VerifyCodeView } from "./features/auth/verify-code/VerifyCodeView"
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -30,7 +31,13 @@ const signupRoute = createRoute({
   component: SignupView,
 })
 
-const routeTree = rootRoute.addChildren([indexRoute, signinRoute, signupRoute])
+const verifyCodeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/verify-code",
+  component: VerifyCodeView,
+})
+
+const routeTree = rootRoute.addChildren([indexRoute, signinRoute, signupRoute, verifyCodeRoute])
 
 export const router = createRouter({ routeTree })
 
