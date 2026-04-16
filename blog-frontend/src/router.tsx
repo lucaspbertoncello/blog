@@ -1,5 +1,6 @@
 import { createRouter, createRoute, createRootRoute, Outlet } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/router-devtools"
+import { AuthLayout } from "./features/auth/AuthLayout"
 import { SigninView } from "./features/auth/signin/SigninView"
 import { SignupView } from "./features/auth/signup/SignupView"
 import { VerifyCodeView } from "./features/auth/verify-code/VerifyCodeView"
@@ -19,25 +20,34 @@ const indexRoute = createRoute({
   component: () => <div>Home</div>,
 })
 
-const signinRoute = createRoute({
+const authLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
+  id: "auth",
+  component: AuthLayout,
+})
+
+const signinRoute = createRoute({
+  getParentRoute: () => authLayoutRoute,
   path: "/signin",
   component: SigninView,
 })
 
 const signupRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authLayoutRoute,
   path: "/signup",
   component: SignupView,
 })
 
 const verifyCodeRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authLayoutRoute,
   path: "/verify-code",
   component: VerifyCodeView,
 })
 
-const routeTree = rootRoute.addChildren([indexRoute, signinRoute, signupRoute, verifyCodeRoute])
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  authLayoutRoute.addChildren([signinRoute, signupRoute, verifyCodeRoute]),
+])
 
 export const router = createRouter({ routeTree })
 
