@@ -110,3 +110,12 @@ listArticleComments:
         path: /articles/{articleId}/comments
         authorizer:
           name: jwtAuthorizer
+
+listAccountComments:
+  handler: src/functions/articles/comments/listAccountComments.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /accounts/{accountId}/comments
+        authorizer:
+          name: jwtAuthorizer
