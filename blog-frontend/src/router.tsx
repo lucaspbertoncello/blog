@@ -1,6 +1,6 @@
 import { createRouter, createRoute, createRootRoute, Outlet } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/router-devtools"
-import { AuthLayout } from "./features/auth/AuthLayout"
+import { AuthLayout } from "./shared/layouts/AuthLayout"
 import { SigninView } from "./features/auth/signin/SigninView"
 import { SignupView } from "./features/auth/signup/SignupView"
 import { VerifyCodeView } from "./features/auth/verify-code/VerifyCodeView"
