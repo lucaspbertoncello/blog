@@ -83,3 +83,12 @@ createComment:
         path: /articles/{articleId}/comments
         authorizer:
           name: jwtAuthorizer
+
+editComment:
+  handler: src/functions/articles/comments/editComment.handler
+  events:
+    - httpApi:
+        method: PATCH
+        path: /articles/{articleId}/comments/{commentId}
+        authorizer:
+          name: jwtAuthorizer
