@@ -29,6 +29,7 @@ provider:
             - dynamodb:Query
             - dynamodb:GetItem
             - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
           Resource:
             - !GetAtt MainTable.Arn
             - !Sub "${MainTable.Arn}/index/*"

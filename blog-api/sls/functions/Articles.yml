@@ -92,3 +92,12 @@ editComment:
         path: /articles/{articleId}/comments/{commentId}
         authorizer:
           name: jwtAuthorizer
+
+deleteComment:
+  handler: src/functions/articles/comments/deleteComment.handler
+  events:
+    - httpApi:
+        method: DELETE
+        path: /articles/{articleId}/comments/{commentId}
+        authorizer:
+          name: jwtAuthorizer
