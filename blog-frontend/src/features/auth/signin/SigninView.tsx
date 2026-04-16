@@ -10,8 +10,9 @@ export function SigninView() {
   const [showPassword, setShowPassword] = useState(false)
 
   return (
-    <div className="dot-grid relative flex min-h-screen items-center justify-center bg-background">
-      <div className="w-full max-w-[340px] px-6">
+    <div className="dot-grid relative flex min-h-screen items-center bg-background">
+      <div className="ml-auto mr-[12%] w-full max-w-[400px]">
+        <div className="rounded-2xl border border-border bg-card px-10 py-10 shadow-[0_8px_40px_-12px_oklch(0_0_0/0.5)]">
 
         <AnimateIn delay={0}>
           <p className="mb-2 text-xs font-light tracking-[0.22em] uppercase text-muted-foreground">
@@ -94,6 +95,7 @@ export function SigninView() {
           </p>
         </AnimateIn>
 
+        </div>
       </div>
     </div>
   )
