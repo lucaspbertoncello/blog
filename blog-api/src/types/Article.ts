@@ -11,5 +11,14 @@ export type Article = {
   updatedAt: string;
 };
 
+export type Comment = {
+  commentId: string;
+  articleId: string;
+  accountId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type ArticleStatus = "draft" | "in_review" | "published" | "rejected";
 export type ArticleVisibility = "public" | "students_only";

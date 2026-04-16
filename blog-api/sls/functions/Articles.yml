@@ -74,3 +74,12 @@ getArticleBySlug:
         path: /articles/{articleId}
         authorizer:
           name: jwtAuthorizer
+
+createComment:
+  handler: src/functions/articles/comments/createComment.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /articles/{articleId}/comments
+        authorizer:
+          name: jwtAuthorizer
