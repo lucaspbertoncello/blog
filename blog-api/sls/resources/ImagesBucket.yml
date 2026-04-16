@@ -3,6 +3,11 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: ${self:service}-images-${self:provider.stage}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
       CorsConfiguration:
         CorsRules:
           - AllowedHeaders: ["*"]

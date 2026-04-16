@@ -15,7 +15,7 @@ export const handler = lambdaHttpAdapter<
     IndexName: "GSI1",
     KeyConditionExpression: "GSI1PK = :pk",
     ExpressionAttributeValues: {
-      ":pk": `SLUG#${params.articleId}`,
+      ":pk": `SLUG#${params.slug}`,
     },
   });
 
@@ -50,5 +50,5 @@ export const handler = lambdaHttpAdapter<
 
 export namespace GetPublicArticleBySlug {
   export type Response = Article;
-  export type UrlParams = { articleId: string };
+  export type UrlParams = { slug: string };
 }

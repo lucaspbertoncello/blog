@@ -64,14 +64,14 @@ getPublicArticleBySlug:
   events:
     - httpApi:
         method: GET
-        path: /articles/public/{articleId}
+        path: /articles/public/{slug}
 
 getArticleBySlug:
   handler: src/functions/articles/getArticleBySlug.handler
   events:
     - httpApi:
         method: GET
-        path: /articles/{articleId}
+        path: /articles/{slug}
         authorizer:
           name: jwtAuthorizer
 
