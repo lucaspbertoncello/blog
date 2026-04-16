@@ -119,3 +119,21 @@ listAccountComments:
         path: /accounts/{accountId}/comments
         authorizer:
           name: jwtAuthorizer
+
+likeArticle:
+  handler: src/functions/articles/likes/likeArticle.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /articles/{articleId}/likes
+        authorizer:
+          name: jwtAuthorizer
+
+listArticleLikes:
+  handler: src/functions/articles/likes/listArticleLikes.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /articles/{articleId}/likes
+        authorizer:
+          name: jwtAuthorizer
