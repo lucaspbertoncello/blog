@@ -1,0 +1,8 @@
+generatePresignedPost:
+  handler: src/functions/images/generatePresignedPost.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /uploads/presigned-post
+        authorizer:
+          name: jwtAuthorizer

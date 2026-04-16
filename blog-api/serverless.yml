@@ -20,9 +20,15 @@ provider:
     COGNITO_USER_POOL_ID: !Ref CognitoUserPool
     COGNITO_CLIENT_ID: !Ref CognitoUserPoolClient
     TABLE_NAME: blog-${self:provider.stage}
+    BUCKET_NAME: !Ref ImagesBucket
   iam:
     role:
       statements:
+        - Effect: Allow
+          Resource: !Sub "arn:aws:s3:::${ImagesBucket}/*"
+          Action:
+            - s3:PutObject
+
         - Effect: Allow
           Action:
             - dynamodb:PutItem
@@ -48,6 +54,7 @@ functions:
   - ${file(./sls/functions/Users.yml)}
   - ${file(./sls/functions/Articles.yml)}
   - ${file(./sls/functions/Roles.yml)}
+  - ${file(./sls/functions/Images.yml)}
 
 resources:
   - ${file(./sls/resources/UserPool.yml)}
