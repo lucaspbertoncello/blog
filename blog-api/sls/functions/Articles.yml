@@ -137,3 +137,12 @@ listArticleLikes:
         path: /articles/{articleId}/likes
         authorizer:
           name: jwtAuthorizer
+
+unlikeArticle:
+  handler: src/functions/articles/likes/unlikeArticle.handler
+  events:
+    - httpApi:
+        method: DELETE
+        path: /articles/{articleId}/likes
+        authorizer:
+          name: jwtAuthorizer
