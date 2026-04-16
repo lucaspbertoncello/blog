@@ -101,3 +101,12 @@ deleteComment:
         path: /articles/{articleId}/comments/{commentId}
         authorizer:
           name: jwtAuthorizer
+
+listArticleComments:
+  handler: src/functions/articles/comments/listArticleComments.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /articles/{articleId}/comments
+        authorizer:
+          name: jwtAuthorizer
