@@ -9,7 +9,7 @@ import { VerifyCodeViewModel } from "./features/auth/verify-code/VerifyCodeViewM
 import { queryClient } from "./shared/lib/queryClient";
 import { Toaster } from "./shared/components/common/sonner";
 import { useAuthStore } from "./domain/auth/stores/useAuthStore";
-import { FeedView } from "./features/feed/FeedView";
+import { FeedViewModel } from "./features/feed/FeedViewModel";
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -75,7 +75,7 @@ const verifyCodeRoute = createRoute({
 const feedRoute = createRoute({
   getParentRoute: () => protectedLayoutRoute,
   path: "/",
-  component: FeedView,
+  component: FeedViewModel,
 });
 // -> feed routes <-
 
