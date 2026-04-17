@@ -12,6 +12,7 @@ import { useAuthStore } from "./domain/auth/stores/useAuthStore";
 import { FeedViewModel } from "./features/feed/FeedViewModel";
 import { ProtectedRouteGuard } from "./shared/guards/ProtectedRouteLayout";
 import { PublicRouteLayout } from "./shared/guards/PublicRouteLayout";
+import { ArticlePageViewModel } from "./features/articlePage/ArticlePageViewModel";
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -87,11 +88,18 @@ const feedRoute = createRoute({
   path: "/",
   component: FeedViewModel,
 });
+
+const articlePageRoute = createRoute({
+  getParentRoute: () => publicLayoutRoute,
+  path: "/articles/$articleSlug",
+  component: ArticlePageViewModel,
+});
 // -> feed routes <-
 
 const routeTree = rootRoute.addChildren([
   publicLayoutRoute.addChildren([
     feedRoute,
+    articlePageRoute,
     authLayoutRoute.addChildren([signinRoute, signupRoute, verifyCodeRoute]),
   ]),
   protectedLayoutRoute.addChildren([]),
