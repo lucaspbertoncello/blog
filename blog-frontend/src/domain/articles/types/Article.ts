@@ -2,6 +2,7 @@ export type Article = {
   articleId: string;
   accountId: string;
   title: string;
+  content: string;
   slug: string;
   tags: string[];
   visibility: ArticleVisibility;

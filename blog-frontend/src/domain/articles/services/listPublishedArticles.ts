@@ -7,5 +7,5 @@ export async function listPublishedArticles() {
 }
 
 export namespace ListPublishedArticlesService {
-  export type Response = { count: number; articles: Omit<Article, "accountId" | "status">[] };
+  export type Response = { count: number; articles: Omit<Article, "accountId" | "status" | "content">[] };
 }
