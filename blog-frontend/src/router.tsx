@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { AuthLayout } from "./shared/layouts/AuthLayout";
 import { SigninViewModel } from "./features/auth/signin/SigninViewModel";
 import { SignupViewModel } from "./features/auth/signup/SignupViewModel";
-import { VerifyCodeView } from "./features/auth/verify-code/VerifyCodeView";
+import { VerifyCodeViewModel } from "./features/auth/verify-code/VerifyCodeViewModel";
 import { queryClient } from "./shared/lib/queryClient";
 import { Toaster } from "./shared/components/common/sonner";
 
@@ -44,7 +44,7 @@ const signupRoute = createRoute({
 const verifyCodeRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
   path: "/verify-code",
-  component: VerifyCodeView,
+  component: VerifyCodeViewModel,
 });
 
 const routeTree = rootRoute.addChildren([
