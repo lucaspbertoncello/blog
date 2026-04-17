@@ -1,4 +1,4 @@
-import { RiHeartFill, RiHeartLine, RiChat3Line } from "@remixicon/react";
+import { RiHeartLine, RiChat3Line } from "@remixicon/react";
 import { Button } from "@/shared/components/common/button";
 import { AnimateIn } from "@/shared/components/custom/AnimateIn";
 import { cn } from "@/shared/lib/utils";
@@ -7,8 +7,6 @@ import { Link } from "@tanstack/react-router";
 
 type FeedViewProps = {
   articles: Article[];
-  likedIds: Set<string>;
-  toggleLike: (articleId: string) => void;
 };
 
 function formatDate(iso: string): string {
@@ -19,7 +17,7 @@ function formatDate(iso: string): string {
   }).format(new Date(iso));
 }
 
-export function FeedView({ articles, likedIds, toggleLike }: FeedViewProps) {
+export function FeedView({ articles }: FeedViewProps) {
   return (
     <div className="relative min-h-screen bg-background text-foreground">
       {/* === Atmospheric depth: radial purple glow from page top === */}
@@ -78,7 +76,6 @@ export function FeedView({ articles, likedIds, toggleLike }: FeedViewProps) {
         {/* Article list */}
         <div>
           {articles.map((article, index) => {
-            const liked = likedIds.has(article.articleId);
             return (
               <AnimateIn
                 key={article.articleId}
@@ -114,18 +111,9 @@ export function FeedView({ articles, likedIds, toggleLike }: FeedViewProps) {
                     </span>
 
                     <div className="flex gap-4">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleLike(article.articleId);
-                        }}
-                        className={cn(
-                          "flex items-center gap-1.5 font-inter text-xs transition-colors",
-                          liked ? "text-primary" : "text-muted-foreground/30 hover:text-primary"
-                        )}
-                      >
-                        {liked ? <RiHeartFill className="size-3.5" /> : <RiHeartLine className="size-3.5" />}
-                        {article.likeCount + (liked ? 1 : 0)}
+                      <button className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/30 transition-colors hover:text-primary">
+                        <RiHeartLine className="size-3.5" />
+                        {article.likeCount}
                       </button>
 
                       <button className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/30 transition-colors hover:text-primary">
