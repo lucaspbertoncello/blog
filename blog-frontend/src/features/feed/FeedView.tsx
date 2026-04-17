@@ -50,12 +50,12 @@ export function FeedView(props: FeedViewProps) {
               dev<span className="text-primary">.</span>blog
             </span>
             <div className="flex items-center gap-3">
-              {!isAuthenticated ? <SigninAction /> : <LogoutAction />}
               <HeaderActions
                 hasAdminAccess={hasAdminAccess}
                 hasWriterAccess={hasWriterAccess}
                 isAuthenticated={isAuthenticated}
               />
+              {!isAuthenticated ? <SigninAction /> : <LogoutAction />}
             </div>
           </header>
         </AnimateIn>
