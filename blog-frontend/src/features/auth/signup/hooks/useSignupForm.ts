@@ -1,5 +1,6 @@
-import { useForm } from "@tanstack/react-form"
-import { z } from "zod"
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
+import { useSignup } from "./useSignup";
 
 export const signupSchema = z
   .object({
@@ -10,11 +11,11 @@ export const signupSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "As senhas não coincidem",
     path: ["confirmPassword"],
-  })
-
-export type SignupSchema = z.infer<typeof signupSchema>
+  });
 
 export function useSignupForm() {
+  const { mutate, isPending } = useSignup();
+
   const form = useForm({
     defaultValues: {
       email: "",
@@ -25,9 +26,9 @@ export function useSignupForm() {
       onChange: signupSchema,
     },
     onSubmit: ({ value }) => {
-      console.log(value)
+      mutate(value);
     },
-  })
+  });
 
-  return { form }
+  return { form, isCreatingAccount: isPending };
 }

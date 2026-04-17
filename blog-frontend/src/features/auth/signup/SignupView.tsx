@@ -1,20 +1,21 @@
-import { RiMailLine, RiLockLine, RiEyeLine, RiEyeOffLine } from "@remixicon/react"
-import { Link } from "@tanstack/react-router"
-import { Button } from "@/shared/components/common/button"
-import { Input } from "@/shared/components/common/input"
-import { Label } from "@/shared/components/common/label"
-import { AnimateIn } from "@/shared/components/custom/AnimateIn"
-import type { useSignupModel } from "./SignupModel"
+import { RiMailLine, RiLockLine, RiEyeLine, RiEyeOffLine } from "@remixicon/react";
+import { Link } from "@tanstack/react-router";
+import { Button } from "@/shared/components/common/button";
+import { Input } from "@/shared/components/common/input";
+import { Label } from "@/shared/components/common/label";
+import { AnimateIn } from "@/shared/components/custom/AnimateIn";
+import type { useSignupModel } from "./SignupModel";
 
-export type SignupViewProps = ReturnType<typeof useSignupModel>
+export type SignupViewProps = ReturnType<typeof useSignupModel>;
 
 const errMsg = (err: unknown) =>
-  typeof err === "string" ? err : ((err as { message?: string })?.message ?? String(err))
+  typeof err === "string" ? err : ((err as { message?: string })?.message ?? String(err));
 
 export function SignupView(props: SignupViewProps) {
-  const { form, passwordVisibilityControl } = props
+  const { signupForm, passwordVisibilityControl } = props;
 
-  const { showConfirm, showPassword, setShowConfirm, setShowPassword } = passwordVisibilityControl
+  const { showConfirm, showPassword, setShowConfirm, setShowPassword } = passwordVisibilityControl;
+  const { form, isCreatingAccount } = signupForm;
 
   return (
     <div className="rounded-2xl border border-border bg-card px-10 py-10 shadow-[0_8px_40px_-12px_oklch(0_0_0/0.5)]">
@@ -33,8 +34,8 @@ export function SignupView(props: SignupViewProps) {
       <form
         className="space-y-3"
         onSubmit={(e) => {
-          e.preventDefault()
-          form.handleSubmit()
+          e.preventDefault();
+          form.handleSubmit();
         }}
       >
         <AnimateIn delay={180}>
@@ -146,7 +147,7 @@ export function SignupView(props: SignupViewProps) {
         </AnimateIn>
 
         <AnimateIn delay={420}>
-          <Button type="submit" className="mt-1 w-full transition-opacity">
+          <Button type="submit" className="mt-1 w-full transition-opacity" isLoading={isCreatingAccount}>
             Criar conta
           </Button>
         </AnimateIn>
@@ -161,5 +162,5 @@ export function SignupView(props: SignupViewProps) {
         </p>
       </AnimateIn>
     </div>
-  )
+  );
 }
