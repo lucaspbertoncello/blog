@@ -23,15 +23,15 @@ const rootRoute = createRootRoute({
 });
 
 // -> guards <-
-const authLayoutRoute = createRoute({
+const publicLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
-  id: "auth",
-  component: AuthLayout,
-  beforeLoad: () => {
-    if (useAuthStore.getState().isAuthenticated()) {
-      throw redirect({ to: "/" });
-    }
-  },
+  id: "public",
+  component: () => <Outlet />,
+  // beforeLoad: () => {
+  //   if (useAuthStore.getState().isAuthenticated()) {
+  //     throw redirect({ to: "/" });
+  //   }
+  // },
 });
 
 const protectedLayoutRoute = createRoute({
@@ -40,11 +40,19 @@ const protectedLayoutRoute = createRoute({
   component: ProtectedRouteGuard,
   beforeLoad: ({ location }) => {
     if (!useAuthStore.getState().isAuthenticated()) {
-      throw redirect({ to: "/signin", search: { redirect: location.href } });
+      throw redirect({ to: "/auth/signin", search: { redirect: location.href } });
     }
   },
 });
 // -> guards <-
+
+// -> layouts <-
+const authLayoutRoute = createRoute({
+  getParentRoute: () => publicLayoutRoute,
+  path: "/auth",
+  component: AuthLayout,
+});
+// -> layouts <-
 
 // -> auth routes <-
 const signinRoute = createRoute({
@@ -65,7 +73,7 @@ const verifyCodeRoute = createRoute({
   validateSearch: z.object({ email: z.string().optional() }),
   beforeLoad: ({ search }) => {
     if (!z.string().email().safeParse(search.email).success) {
-      throw redirect({ to: "/signup" });
+      throw redirect({ to: "/auth/signup" });
     }
   },
   component: VerifyCodeViewModel,
@@ -74,15 +82,18 @@ const verifyCodeRoute = createRoute({
 
 // -> feed routes <-
 const feedRoute = createRoute({
-  getParentRoute: () => protectedLayoutRoute,
+  getParentRoute: () => publicLayoutRoute,
   path: "/",
   component: FeedViewModel,
 });
 // -> feed routes <-
 
 const routeTree = rootRoute.addChildren([
-  authLayoutRoute.addChildren([signinRoute, signupRoute, verifyCodeRoute]),
-  protectedLayoutRoute.addChildren([feedRoute]),
+  publicLayoutRoute.addChildren([
+    feedRoute,
+    authLayoutRoute.addChildren([signinRoute, signupRoute, verifyCodeRoute]),
+  ]),
+  protectedLayoutRoute.addChildren([]),
 ]);
 
 export const router = createRouter({ routeTree });
