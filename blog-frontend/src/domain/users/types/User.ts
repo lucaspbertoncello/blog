@@ -2,7 +2,9 @@ export type User = {
   accountId: string;
   email: string;
   active: true;
-  role: "admin" | "writer" | "student";
+  role: UserRoles;
   createdAt: string;
   updatedAt: string;
 };
+
+export type UserRoles = "admin" | "writer" | "student";
