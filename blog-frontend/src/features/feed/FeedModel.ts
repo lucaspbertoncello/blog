@@ -1,7 +1,13 @@
-import { MOCK_ARTICLES } from "./mock-data";
+import { useListPublishedArticles } from "@/domain/articles/hooks/useListPublishedArticles";
 
 export function useFeedModel() {
+  const { data, isFetching, error, refetch } = useListPublishedArticles();
+
   return {
-    articles: MOCK_ARTICLES,
+    articles: data?.articles ?? [],
+    count: data?.count,
+    isLoadingPublishedArticles: isFetching,
+    listArticlesError: error,
+    refetchArticles: refetch,
   };
 }

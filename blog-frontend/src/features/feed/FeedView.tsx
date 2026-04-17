@@ -8,6 +8,9 @@ import { ArticleItem } from "./components/ArticleItem";
 import { SigninAction } from "./components/SigninAction";
 import { LogoutAction } from "./components/LogoutAction";
 import { HeaderActions } from "./components/HeaderActions";
+import { LoadingState } from "./components/states/LoadingState";
+import { ErrorState } from "./components/states/ErrorState";
+import { EmptyState } from "./components/states/EmptyState";
 import { useAuthStore } from "@/domain/auth/stores/useAuthStore";
 import { useShallow } from "zustand/react/shallow";
 import { useUserStore } from "@/domain/users/stores/useUserStore";
@@ -15,7 +18,7 @@ import { useUserStore } from "@/domain/users/stores/useUserStore";
 export type FeedViewProps = ReturnType<typeof useFeedModel>;
 
 export function FeedView(props: FeedViewProps) {
-  const { articles } = props;
+  const { articles, isLoadingPublishedArticles, listArticlesError, refetchArticles } = props;
 
   const authStore = useAuthStore(
     useShallow((state) => ({
@@ -58,17 +61,37 @@ export function FeedView(props: FeedViewProps) {
         </AnimateIn>
 
         <div>
-          {articles.map((article, index) => {
-            return (
-              <AnimateIn
-                key={article.articleId}
-                delay={220 + index * 65}
-                className={cn("border-b border-border", index === articles.length - 1 && "border-0")}
-              >
-                <ArticleItem article={article} isAuthenticated={isAuthenticated} key={article.articleId} />
-              </AnimateIn>
-            );
-          })}
+          {isLoadingPublishedArticles && (
+            <AnimateIn delay={220}>
+              <LoadingState />
+            </AnimateIn>
+          )}
+
+          {!isLoadingPublishedArticles && listArticlesError && (
+            <AnimateIn delay={220}>
+              <ErrorState onRetry={refetchArticles} />
+            </AnimateIn>
+          )}
+
+          {!isLoadingPublishedArticles && !listArticlesError && articles.length === 0 && (
+            <AnimateIn delay={220}>
+              <EmptyState />
+            </AnimateIn>
+          )}
+
+          {!isLoadingPublishedArticles &&
+            !listArticlesError &&
+            articles.map((article, index) => {
+              return (
+                <AnimateIn
+                  key={article.articleId}
+                  delay={220 + index * 65}
+                  className={cn("border-b border-border", index === articles.length - 1 && "border-0")}
+                >
+                  <ArticleItem article={article} isAuthenticated={isAuthenticated} key={article.articleId} />
+                </AnimateIn>
+              );
+            })}
         </div>
       </div>
     </div>
