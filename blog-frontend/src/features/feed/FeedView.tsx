@@ -52,12 +52,12 @@ export function FeedView({ articles, likedIds, toggleLike }: FeedViewProps) {
       </svg>
 
       {/* === Vertical grid lines — fixed, always mark the 1000px column edges === */}
-      <div className="pointer-events-none fixed top-0 bottom-0 left-[calc(50%_-_500px)] z-0 w-px bg-muted-foreground/20" />
-      <div className="pointer-events-none fixed top-0 bottom-0 right-[calc(50%_-_500px)] z-0 w-px bg-muted-foreground/20" />
+      <div className="pointer-events-none fixed top-0 bottom-0 left-[calc(50%-500px)] z-0 w-px bg-muted-foreground/20" />
+      <div className="pointer-events-none fixed top-0 bottom-0 right-[calc(50%-500px)] z-0 w-px bg-muted-foreground/20" />
 
 
       {/* === Page content === */}
-      <div className="relative z-10 mx-auto max-w-[1000px] px-12">
+      <div className="relative z-10 mx-auto max-w-250 px-12">
 
         {/* Header */}
         <AnimateIn delay={0}>
