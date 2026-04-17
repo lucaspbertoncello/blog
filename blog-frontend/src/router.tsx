@@ -1,16 +1,20 @@
 import { createRouter, createRoute, createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { AuthLayout } from "./shared/layouts/AuthLayout";
 import { SigninView } from "./features/auth/signin/SigninView";
 import { SignupViewModel } from "./features/auth/signup/SignupViewModel";
 import { VerifyCodeView } from "./features/auth/verify-code/VerifyCodeView";
+import { queryClient } from "./shared/lib/queryClient";
+import { Toaster } from "./shared/components/common/sonner";
 
 const rootRoute = createRootRoute({
   component: () => (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Outlet />
+      <Toaster />
       {import.meta.env.DEV && <TanStackRouterDevtools />}
-    </>
+    </QueryClientProvider>
   ),
 });
 
