@@ -17,7 +17,7 @@ export function AuthLayout() {
       {/* Radial mask — fades grid toward center */}
       <div className="pointer-events-none absolute inset-0 bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
 
-      <div className="relative z-10 w-full max-w-100 px-4">
+      <div className="relative z-10 w-full max-w-md px-4">
         <Outlet />
       </div>
 
