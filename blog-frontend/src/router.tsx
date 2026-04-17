@@ -2,7 +2,7 @@ import { createRouter, createRoute, createRootRoute, Outlet } from "@tanstack/re
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { AuthLayout } from "./shared/layouts/AuthLayout";
-import { SigninView } from "./features/auth/signin/SigninView";
+import { SigninViewModel } from "./features/auth/signin/SigninViewModel";
 import { SignupViewModel } from "./features/auth/signup/SignupViewModel";
 import { VerifyCodeView } from "./features/auth/verify-code/VerifyCodeView";
 import { queryClient } from "./shared/lib/queryClient";
@@ -32,7 +32,7 @@ const authLayoutRoute = createRoute({
 const signinRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
   path: "/signin",
-  component: SigninView,
+  component: SigninViewModel,
 });
 
 const signupRoute = createRoute({
