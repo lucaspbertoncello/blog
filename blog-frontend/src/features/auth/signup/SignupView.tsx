@@ -4,12 +4,10 @@ import { Button } from "@/shared/components/common/button";
 import { Input } from "@/shared/components/common/input";
 import { Label } from "@/shared/components/common/label";
 import { AnimateIn } from "@/shared/components/custom/AnimateIn";
+import { getFieldError } from "@/shared/lib/form";
 import type { useSignupModel } from "./SignupModel";
 
 export type SignupViewProps = ReturnType<typeof useSignupModel>;
-
-const errMsg = (err: unknown) =>
-  typeof err === "string" ? err : ((err as { message?: string })?.message ?? String(err));
 
 export function SignupView(props: SignupViewProps) {
   const { signupForm, passwordVisibilityControl } = props;
@@ -61,7 +59,7 @@ export function SignupView(props: SignupViewProps) {
                   />
                 </div>
                 {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
-                  <p className="text-xs text-destructive">{errMsg(field.state.meta.errors[0])}</p>
+                  <p className="text-xs text-destructive">{getFieldError(field.state.meta.errors[0])}</p>
                 )}
               </div>
             )}
@@ -100,7 +98,7 @@ export function SignupView(props: SignupViewProps) {
                   </button>
                 </div>
                 {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
-                  <p className="text-xs text-destructive">{errMsg(field.state.meta.errors[0])}</p>
+                  <p className="text-xs text-destructive">{getFieldError(field.state.meta.errors[0])}</p>
                 )}
               </div>
             )}
@@ -139,7 +137,7 @@ export function SignupView(props: SignupViewProps) {
                   </button>
                 </div>
                 {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
-                  <p className="text-xs text-destructive">{errMsg(field.state.meta.errors[0])}</p>
+                  <p className="text-xs text-destructive">{getFieldError(field.state.meta.errors[0])}</p>
                 )}
               </div>
             )}
