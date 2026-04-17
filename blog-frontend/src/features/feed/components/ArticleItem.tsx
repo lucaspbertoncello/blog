@@ -15,7 +15,7 @@ export function ArticleItem(props: ArticleItemProps) {
   const cannotSee = article.visibility === "students_only" && !isAuthenticated;
 
   return (
-    <Link to="/articles/$articleSlug" params={{ articleSlug: article.slug }}>
+    <Link disabled={cannotSee} to="/articles/$articleSlug" params={{ articleSlug: article.slug }}>
       <article className="group flex cursor-pointer items-center gap-6 py-7">
         <div className="flex flex-1 flex-col gap-2.5">
           <h2
@@ -40,11 +40,6 @@ export function ArticleItem(props: ArticleItemProps) {
                 </span>
               ))}
             </div>
-            {cannotSee && (
-              <span className="rounded-full border border-amber-500/20 bg-amber-500/8 px-2.5 py-0.5 font-inter text-xs font-medium text-amber-500/75">
-                só para estudantes
-              </span>
-            )}
           </div>
 
           <footer className="flex items-center justify-between">
