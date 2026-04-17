@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
-import { signup } from "../services/signup";
 import { toast } from "sonner";
 import { getApiErrorMessage } from "@/shared/lib/apiError";
+import { signup } from "../services/signup";
 
 export function useSignup() {
   const methods = useMutation({

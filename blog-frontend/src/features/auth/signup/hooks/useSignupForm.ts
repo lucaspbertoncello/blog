@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
-import { useSignup } from "./useSignup";
+import { useSignup } from "@/domain/auth/hooks/useSignup";
 
 export const signupSchema = z
   .object({
