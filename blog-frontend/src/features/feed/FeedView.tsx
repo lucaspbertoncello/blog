@@ -58,12 +58,6 @@ export function FeedView(props: FeedViewProps) {
           </header>
         </AnimateIn>
 
-        <AnimateIn delay={150}>
-          <p className="pt-1 font-inter text-xs font-semibold tracking-widest text-muted-foreground/40 uppercase">
-            Artigos recentes
-          </p>
-        </AnimateIn>
-
         <div>
           {articles.map((article, index) => {
             const cannotSee = article.visibility === "students_only" && !isAuthenticated;
