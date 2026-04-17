@@ -154,6 +154,18 @@
   button {
     @apply cursor-pointer;
   }
+
+  /* background-clip:text clips the browser's autofill background to the text shapes,
+     preserving the input's transparent bg-input/30 and original border appearance. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: var(--foreground);
+    caret-color: var(--foreground);
+  }
 }
 
 @layer utilities {
