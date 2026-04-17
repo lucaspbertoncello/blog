@@ -9,13 +9,14 @@ export const verifyCodeSchema = z.object({
 });
 
 export function useVerifyCodeForm() {
-  const { email = "" } = useSearch({ strict: false }) as { email?: string };
+  // beforeLoad in the route guarantees email is a valid string at this point
+  const { email } = useSearch({ strict: true, from: "/auth/verify-code" });
   const { mutate, isPending } = useVerifyCode();
   const navigate = useNavigate({ from: "/verify-code" });
 
   const form = useForm({
     defaultValues: {
-      email,
+      email: email!,
       code: "",
     },
     validators: {

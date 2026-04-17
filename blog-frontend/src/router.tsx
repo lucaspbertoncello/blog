@@ -1,4 +1,5 @@
 import { createRouter, createRoute, createRootRoute, Outlet, redirect } from "@tanstack/react-router";
+import { z } from "zod";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { AuthLayout } from "./shared/layouts/AuthLayout";
@@ -60,6 +61,12 @@ const signupRoute = createRoute({
 const verifyCodeRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
   path: "/verify-code",
+  validateSearch: z.object({ email: z.string().optional() }),
+  beforeLoad: ({ search }) => {
+    if (!z.string().email().safeParse(search.email).success) {
+      throw redirect({ to: "/signup" });
+    }
+  },
   component: VerifyCodeViewModel,
 });
 // -> auth routes <-
