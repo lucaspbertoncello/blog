@@ -10,6 +10,7 @@ import { queryClient } from "./shared/lib/queryClient";
 import { Toaster } from "./shared/components/common/sonner";
 import { useAuthStore } from "./domain/auth/stores/useAuthStore";
 import { FeedViewModel } from "./features/feed/FeedViewModel";
+import { ProtectedRouteGuard } from "./shared/guards/ProtectedRouteLayout";
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -36,7 +37,7 @@ const authLayoutRoute = createRoute({
 const protectedLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "protected",
-  component: () => <Outlet />,
+  component: ProtectedRouteGuard,
   beforeLoad: ({ location }) => {
     if (!useAuthStore.getState().isAuthenticated()) {
       throw redirect({ to: "/signin", search: { redirect: location.href } });
