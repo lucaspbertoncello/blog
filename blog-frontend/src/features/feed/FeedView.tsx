@@ -1,13 +1,12 @@
-import { RiHeartLine, RiChat3Line } from "@remixicon/react";
+import { RiHeartLine, RiChat3Line, RiLockLine } from "@remixicon/react";
 import { Button } from "@/shared/components/common/button";
 import { AnimateIn } from "@/shared/components/custom/AnimateIn";
 import { cn } from "@/shared/lib/utils";
-import type { Article } from "./types";
 import { Link } from "@tanstack/react-router";
+import type { useFeedModel } from "./FeedModel";
+import { toast } from "sonner";
 
-type FeedViewProps = {
-  articles: Article[];
-};
+export type FeedViewProps = ReturnType<typeof useFeedModel>;
 
 function formatDate(iso: string): string {
   return new Intl.DateTimeFormat("pt-BR", {
@@ -17,7 +16,12 @@ function formatDate(iso: string): string {
   }).format(new Date(iso));
 }
 
-export function FeedView({ articles }: FeedViewProps) {
+export function FeedView(props: FeedViewProps) {
+  const { articles, userStore, authStore } = props;
+
+  const { account, hasAdminAccess, hasWriterAccess } = userStore;
+  const { clearAuthTokens, isAuthenticated } = authStore;
+
   return (
     <div className="relative min-h-screen bg-background text-foreground">
       {/* === Atmospheric depth: radial purple glow from page top === */}
@@ -57,11 +61,21 @@ export function FeedView({ articles }: FeedViewProps) {
               dev<span className="text-primary">.</span>blog
             </span>
             <div className="flex items-center gap-3">
-              <Button size="sm">
+              {!isAuthenticated ? (
                 <Link from="/" to="/auth/signin">
-                  Entrar
+                  <Button>Entrar</Button>
                 </Link>
-              </Button>
+              ) : (
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    clearAuthTokens();
+                    toast.success("Você deslogou de sua conta");
+                  }}
+                >
+                  Sair
+                </Button>
+              )}
             </div>
           </header>
         </AnimateIn>
@@ -82,46 +96,80 @@ export function FeedView({ articles }: FeedViewProps) {
                 delay={220 + index * 65}
                 className={cn("border-b border-border", index === articles.length - 1 && "border-0")}
               >
-                <article className="group flex cursor-pointer flex-col gap-2.5 py-7">
-                  <h2 className="font-sans text-lg leading-snug font-semibold tracking-tight text-foreground/75 transition-colors duration-200 group-hover:text-foreground">
-                    {article.title}
-                  </h2>
+                <article className="group flex cursor-pointer items-center gap-6 py-7">
+                  {/* Left: article content */}
+                  <div className="flex flex-1 flex-col gap-2.5">
+                    <h2
+                      className={cn(
+                        "font-sans text-lg leading-snug font-semibold tracking-tight text-foreground/75 transition-colors duration-200 group-hover:text-foreground",
+                        article.visibility === "students_only" && "select-none blur-sm",
+                      )}
+                    >
+                      {article.title}
+                    </h2>
 
-                  <div className="flex flex-wrap gap-1.5">
-                    {article.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-primary/20 bg-primary/8 px-2.5 py-0.5 font-inter text-xs font-medium text-primary/75"
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <div
+                        className={cn(
+                          "flex flex-wrap gap-1.5",
+                          article.visibility === "students_only" && "pointer-events-none select-none blur-sm",
+                        )}
                       >
-                        {tag}
+                        {article.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded-full border border-primary/20 bg-primary/8 px-2.5 py-0.5 font-inter text-xs font-medium text-primary/75"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      {article.visibility === "students_only" && (
+                        <span className="rounded-full border border-amber-500/20 bg-amber-500/8 px-2.5 py-0.5 font-inter text-xs font-medium text-amber-500/75">
+                          só para estudantes
+                        </span>
+                      )}
+                    </div>
+
+                    <footer className="flex items-center justify-between">
+                      <span
+                        className={cn(
+                          "font-inter text-xs text-muted-foreground/50",
+                          article.visibility === "students_only" && "select-none blur-sm",
+                        )}
+                      >
+                        <strong className="font-medium text-muted-foreground/70">{article.authorName}</strong>
+                        {" · "}
+                        {formatDate(article.createdAt)}
                       </span>
-                    ))}
-                    {article.visibility === "students_only" && (
-                      <span className="rounded-full border border-amber-500/20 bg-amber-500/8 px-2.5 py-0.5 font-inter text-xs font-medium text-amber-500/75">
-                        🔒 só para estudantes
-                      </span>
-                    )}
+
+                      {article.visibility !== "students_only" && (
+                        <div className="flex gap-4">
+                          <button className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/30 transition-colors hover:text-primary">
+                            <RiHeartLine className="size-3.5" />
+                            {article.likeCount}
+                          </button>
+
+                          <button className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/30 transition-colors hover:text-primary">
+                            <RiChat3Line className="size-3.5" />
+                            {article.commentCount}
+                          </button>
+                        </div>
+                      )}
+                    </footer>
                   </div>
 
-                  <footer className="flex items-center justify-between">
-                    <span className="font-inter text-xs text-muted-foreground/50">
-                      <strong className="font-medium text-muted-foreground/70">{article.authorName}</strong>
-                      {" · "}
-                      {formatDate(article.createdAt)}
-                    </span>
-
-                    <div className="flex gap-4">
-                      <button className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/30 transition-colors hover:text-primary">
-                        <RiHeartLine className="size-3.5" />
-                        {article.likeCount}
-                      </button>
-
-                      <button className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/30 transition-colors hover:text-primary">
-                        <RiChat3Line className="size-3.5" />
-                        {article.commentCount}
-                      </button>
+                  {/* Right: lock icon + login button, vertically centered */}
+                  {article.visibility === "students_only" && (
+                    <div className="flex shrink-0 items-center gap-3">
+                      <div className="flex size-8 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
+                        <RiLockLine className="size-3.5 text-primary" />
+                      </div>
+                      <Link from="/" to="/auth/signin">
+                        <Button>Entrar</Button>
+                      </Link>
                     </div>
-                  </footer>
+                  )}
                 </article>
               </AnimateIn>
             );
