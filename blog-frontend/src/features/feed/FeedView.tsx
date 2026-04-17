@@ -3,6 +3,7 @@ import { Button } from "@/shared/components/common/button";
 import { AnimateIn } from "@/shared/components/custom/AnimateIn";
 import { cn } from "@/shared/lib/utils";
 import type { Article } from "./types";
+import { Link } from "@tanstack/react-router";
 
 type FeedViewProps = {
   articles: Article[];
@@ -21,7 +22,6 @@ function formatDate(iso: string): string {
 export function FeedView({ articles, likedIds, toggleLike }: FeedViewProps) {
   return (
     <div className="relative min-h-screen bg-background text-foreground">
-
       {/* === Atmospheric depth: radial purple glow from page top === */}
       <div
         aria-hidden="true"
@@ -40,12 +40,7 @@ export function FeedView({ articles, likedIds, toggleLike }: FeedViewProps) {
         height="100%"
       >
         <filter id="feed-grain">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.68"
-            numOctaves="4"
-            stitchTiles="stitch"
-          />
+          <feTurbulence type="fractalNoise" baseFrequency="0.68" numOctaves="4" stitchTiles="stitch" />
           <feColorMatrix type="saturate" values="0" />
         </filter>
         <rect width="100%" height="100%" filter="url(#feed-grain)" />
@@ -53,12 +48,10 @@ export function FeedView({ articles, likedIds, toggleLike }: FeedViewProps) {
 
       {/* === Vertical grid lines — fixed, always mark the 1000px column edges === */}
       <div className="pointer-events-none fixed top-0 bottom-0 left-[calc(50%-500px)] z-0 w-px bg-muted-foreground/20" />
-      <div className="pointer-events-none fixed top-0 bottom-0 right-[calc(50%-500px)] z-0 w-px bg-muted-foreground/20" />
-
+      <div className="pointer-events-none fixed top-0 right-[calc(50%-500px)] bottom-0 z-0 w-px bg-muted-foreground/20" />
 
       {/* === Page content === */}
       <div className="relative z-10 mx-auto max-w-250 px-12">
-
         {/* Header */}
         <AnimateIn delay={0}>
           <header className="flex items-center justify-between border-b border-border py-9">
@@ -66,32 +59,18 @@ export function FeedView({ articles, likedIds, toggleLike }: FeedViewProps) {
               dev<span className="text-primary">.</span>blog
             </span>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm">Entrar</Button>
-              <Button size="sm">Assinar plataforma</Button>
+              <Button size="sm">
+                <Link from="/" to="/auth/signin">
+                  Entrar
+                </Link>
+              </Button>
             </div>
           </header>
         </AnimateIn>
 
-        {/* Subscribe banner */}
-        <AnimateIn delay={80}>
-          <div className="my-9 flex items-center justify-between gap-5 rounded-xl border border-border bg-primary/5 px-7 py-6">
-            <div>
-              <h3 className="font-sans text-sm font-semibold tracking-tight text-foreground/85">
-                Acesse artigos exclusivos para estudantes
-              </h3>
-              <p className="mt-1 font-inter text-xs text-muted-foreground">
-                Assine a plataforma e desbloqueie todo o conteúdo dos nossos escritores
-              </p>
-            </div>
-            <Button size="sm" className="shrink-0">
-              Assinar agora
-            </Button>
-          </div>
-        </AnimateIn>
-
         {/* Section label */}
         <AnimateIn delay={150}>
-          <p className="pt-1 font-inter text-xs font-semibold uppercase tracking-widest text-muted-foreground/40">
+          <p className="pt-1 font-inter text-xs font-semibold tracking-widest text-muted-foreground/40 uppercase">
             Artigos recentes
           </p>
         </AnimateIn>
@@ -104,14 +83,10 @@ export function FeedView({ articles, likedIds, toggleLike }: FeedViewProps) {
               <AnimateIn
                 key={article.articleId}
                 delay={220 + index * 65}
-                className={cn(
-                  "border-b border-border",
-                  index === articles.length - 1 && "border-0",
-                )}
+                className={cn("border-b border-border", index === articles.length - 1 && "border-0")}
               >
                 <article className="group flex cursor-pointer flex-col gap-2.5 py-7">
-
-                  <h2 className="font-sans text-lg font-semibold leading-snug tracking-tight text-foreground/75 transition-colors duration-200 group-hover:text-foreground">
+                  <h2 className="font-sans text-lg leading-snug font-semibold tracking-tight text-foreground/75 transition-colors duration-200 group-hover:text-foreground">
                     {article.title}
                   </h2>
 
@@ -133,9 +108,7 @@ export function FeedView({ articles, likedIds, toggleLike }: FeedViewProps) {
 
                   <footer className="flex items-center justify-between">
                     <span className="font-inter text-xs text-muted-foreground/50">
-                      <strong className="font-medium text-muted-foreground/70">
-                        {article.authorName}
-                      </strong>
+                      <strong className="font-medium text-muted-foreground/70">{article.authorName}</strong>
                       {" · "}
                       {formatDate(article.createdAt)}
                     </span>
@@ -148,16 +121,10 @@ export function FeedView({ articles, likedIds, toggleLike }: FeedViewProps) {
                         }}
                         className={cn(
                           "flex items-center gap-1.5 font-inter text-xs transition-colors",
-                          liked
-                            ? "text-primary"
-                            : "text-muted-foreground/30 hover:text-primary",
+                          liked ? "text-primary" : "text-muted-foreground/30 hover:text-primary"
                         )}
                       >
-                        {liked ? (
-                          <RiHeartFill className="size-3.5" />
-                        ) : (
-                          <RiHeartLine className="size-3.5" />
-                        )}
+                        {liked ? <RiHeartFill className="size-3.5" /> : <RiHeartLine className="size-3.5" />}
                         {article.likeCount + (liked ? 1 : 0)}
                       </button>
 
@@ -167,13 +134,11 @@ export function FeedView({ articles, likedIds, toggleLike }: FeedViewProps) {
                       </button>
                     </div>
                   </footer>
-
                 </article>
               </AnimateIn>
             );
           })}
         </div>
-
       </div>
     </div>
   );
