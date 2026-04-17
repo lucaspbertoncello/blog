@@ -154,7 +154,7 @@ export function SignupView(props: SignupViewProps) {
       <AnimateIn delay={500}>
         <p className="mt-7 text-center text-xs text-muted-foreground">
           Já tem conta?{" "}
-          <Link to="/signin" className="text-primary transition-colors hover:text-primary/80">
+          <Link to="/auth/signin" className="text-primary transition-colors hover:text-primary/80">
             Entrar
           </Link>
         </p>

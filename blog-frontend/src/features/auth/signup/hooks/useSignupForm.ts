@@ -16,7 +16,7 @@ export const signupSchema = z
 
 export function useSignupForm() {
   const { mutate, isPending } = useSignup();
-  const navigate = useNavigate({ from: "/signup" });
+  const navigate = useNavigate({ from: "/auth/signup" });
 
   const form = useForm({
     defaultValues: {
@@ -28,7 +28,9 @@ export function useSignupForm() {
       onChange: signupSchema,
     },
     onSubmit: ({ value }) => {
-      mutate(value, { onSuccess: () => navigate({ to: "/verify-code", search: { email: value.email } }) });
+      mutate(value, {
+        onSuccess: () => navigate({ to: "/auth/verify-code", search: { email: value.email } }),
+      });
     },
   });
 

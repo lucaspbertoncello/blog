@@ -10,9 +10,9 @@ export const verifyCodeSchema = z.object({
 
 export function useVerifyCodeForm() {
   // beforeLoad in the route guarantees email is a valid string at this point
-  const { email } = useSearch({ strict: true, from: "/auth/verify-code" });
+  const { email } = useSearch({ strict: true, from: "/public/auth/verify-code" });
   const { mutate, isPending } = useVerifyCode();
-  const navigate = useNavigate({ from: "/verify-code" });
+  const navigate = useNavigate({ from: "/auth/verify-code" });
 
   const form = useForm({
     defaultValues: {
@@ -23,7 +23,7 @@ export function useVerifyCodeForm() {
       onChange: verifyCodeSchema,
     },
     onSubmit: ({ value }) => {
-      mutate(value, { onSuccess: () => navigate({ to: "/signin" }) });
+      mutate(value, { onSuccess: () => navigate({ to: "/auth/signin" }) });
     },
   });
 

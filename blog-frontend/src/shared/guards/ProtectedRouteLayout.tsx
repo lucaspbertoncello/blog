@@ -10,7 +10,7 @@ export function ProtectedRouteGuard() {
 
   if (isError) {
     clearAuthTokens();
-    navigate({ to: "/signin" });
+    navigate({ to: "/auth/signin" });
     toast.error("Faça login novamente");
   }
 

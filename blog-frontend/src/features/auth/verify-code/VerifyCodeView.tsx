@@ -1,30 +1,29 @@
-import { Link } from "@tanstack/react-router"
-import { RiMailSendLine } from "@remixicon/react"
-import { Button } from "@/shared/components/common/button"
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/shared/components/common/input-otp"
-import { AnimateIn } from "@/shared/components/custom/AnimateIn"
-import { getFieldError } from "@/shared/lib/form"
-import type { useVerifyCodeModel } from "./VerifyCodeModel"
+import { Link } from "@tanstack/react-router";
+import { RiMailSendLine } from "@remixicon/react";
+import { Button } from "@/shared/components/common/button";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/shared/components/common/input-otp";
+import { AnimateIn } from "@/shared/components/custom/AnimateIn";
+import { getFieldError } from "@/shared/lib/form";
+import type { useVerifyCodeModel } from "./VerifyCodeModel";
 
-export type VerifyCodeViewProps = ReturnType<typeof useVerifyCodeModel>
+export type VerifyCodeViewProps = ReturnType<typeof useVerifyCodeModel>;
 
 export function VerifyCodeView(props: VerifyCodeViewProps) {
-  const { verifyCodeForm, resendCooldown } = props
-  const { form, isVerifying } = verifyCodeForm
-  const { cooldown, startCooldown } = resendCooldown
+  const { verifyCodeForm, resendCooldown } = props;
+  const { form, isVerifying } = verifyCodeForm;
+  const { cooldown, startCooldown } = resendCooldown;
 
   return (
     <div className="rounded-2xl border border-border bg-card px-10 py-10 shadow-[0_8px_40px_-12px_oklch(0_0_0/0.5)]">
-
       <AnimateIn delay={0}>
-        <p className="mb-2 text-xs font-light tracking-[0.22em] uppercase text-muted-foreground">
-          @Blog
-        </p>
+        <p className="mb-2 text-xs font-light tracking-[0.22em] text-muted-foreground uppercase">@Blog</p>
       </AnimateIn>
 
       <AnimateIn delay={80}>
-        <h1 className="mb-3 text-[2rem] font-light leading-tight text-foreground/80">
-          Verifique<br />seu email.
+        <h1 className="mb-3 text-[2rem] leading-tight font-light text-foreground/80">
+          Verifique
+          <br />
+          seu email.
         </h1>
       </AnimateIn>
 
@@ -37,8 +36,8 @@ export function VerifyCodeView(props: VerifyCodeViewProps) {
 
       <form
         onSubmit={(e) => {
-          e.preventDefault()
-          form.handleSubmit()
+          e.preventDefault();
+          form.handleSubmit();
         }}
         className="space-y-6"
       >
@@ -85,9 +84,7 @@ export function VerifyCodeView(props: VerifyCodeViewProps) {
         <p className="mt-7 text-center text-xs text-muted-foreground">
           Não recebeu o código?{" "}
           {cooldown > 0 ? (
-            <span className="tabular-nums text-muted-foreground/60">
-              Reenviar em {cooldown}s
-            </span>
+            <span className="text-muted-foreground/60 tabular-nums">Reenviar em {cooldown}s</span>
           ) : (
             <button
               type="button"
@@ -102,12 +99,14 @@ export function VerifyCodeView(props: VerifyCodeViewProps) {
 
       <AnimateIn delay={460}>
         <p className="mt-3 text-center text-xs text-muted-foreground">
-          <Link to="/signin" className="text-muted-foreground/60 transition-colors hover:text-muted-foreground">
+          <Link
+            to="/auth/signin"
+            className="text-muted-foreground/60 transition-colors hover:text-muted-foreground"
+          >
             ← Voltar para o login
           </Link>
         </p>
       </AnimateIn>
-
     </div>
-  )
+  );
 }

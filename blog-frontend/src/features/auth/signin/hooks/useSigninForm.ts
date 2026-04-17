@@ -12,7 +12,7 @@ export const signinSchema = z.object({
 
 export function useSigninForm() {
   const { mutate, isPending } = useSignin();
-  const navigate = useNavigate({ from: "/signin" });
+  const navigate = useNavigate({ from: "/auth/signin" });
   const { setAuthTokens } = useAuthStore(
     useShallow((state) => ({
       setAuthTokens: state.setAuthTokens,
