@@ -4,10 +4,13 @@ import { Link } from "@tanstack/react-router";
 export type HeaderActionsProps = {
   hasAdminAccess(): boolean;
   hasWriterAccess(): boolean;
+  isAuthenticated: boolean;
 };
 
 export function HeaderActions(props: HeaderActionsProps) {
-  const { hasAdminAccess, hasWriterAccess } = props;
+  const { hasAdminAccess, hasWriterAccess, isAuthenticated } = props;
+
+  if (!isAuthenticated) return;
 
   return (
     <>
