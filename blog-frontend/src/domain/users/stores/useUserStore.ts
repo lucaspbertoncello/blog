@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { devtools } from "zustand/middleware";
 import type { User, UserRoles } from "../types/User";
 
 export type State = {
@@ -14,7 +15,8 @@ export type Actions = {
 
 export type UserStore = State & Actions;
 
-export const useUserStore = create<UserStore>()((set, get) => ({
+export const useUserStore = create<UserStore>()(
+  devtools((set, get) => ({
   account: null,
   role: null,
   hasAdminAccess: () => {
@@ -24,4 +26,5 @@ export const useUserStore = create<UserStore>()((set, get) => ({
     return get().role === "writer" || get().role === "admin";
   },
   setAccountData: ({ account, role }) => set({ account, role }),
-}));
+  }), { name: "UserStore" }
+));
