@@ -65,6 +65,8 @@ export function FeedView(props: FeedViewProps) {
 
         <div>
           {articles.map((article, index) => {
+            const cannotSee = article.visibility === "students_only" && !isAuthenticated;
+
             return (
               <AnimateIn
                 key={article.articleId}
@@ -76,7 +78,7 @@ export function FeedView(props: FeedViewProps) {
                     <h2
                       className={cn(
                         "font-sans text-lg leading-snug font-semibold tracking-tight text-foreground/75 transition-colors duration-200 group-hover:text-foreground",
-                        article.visibility === "students_only" && "select-none blur-sm",
+                        cannotSee && "blur-sm select-none"
                       )}
                     >
                       {article.title}
@@ -86,7 +88,7 @@ export function FeedView(props: FeedViewProps) {
                       <div
                         className={cn(
                           "flex flex-wrap gap-1.5",
-                          article.visibility === "students_only" && "pointer-events-none select-none blur-sm",
+                          cannotSee && "pointer-events-none blur-sm select-none"
                         )}
                       >
                         {article.tags.map((tag) => (
@@ -98,7 +100,7 @@ export function FeedView(props: FeedViewProps) {
                           </span>
                         ))}
                       </div>
-                      {article.visibility === "students_only" && (
+                      {cannotSee && (
                         <span className="rounded-full border border-amber-500/20 bg-amber-500/8 px-2.5 py-0.5 font-inter text-xs font-medium text-amber-500/75">
                           só para estudantes
                         </span>
@@ -109,7 +111,7 @@ export function FeedView(props: FeedViewProps) {
                       <span
                         className={cn(
                           "font-inter text-xs text-muted-foreground/50",
-                          article.visibility === "students_only" && "select-none blur-sm",
+                          cannotSee && "blur-sm select-none"
                         )}
                       >
                         <strong className="font-medium text-muted-foreground/70">{article.authorName}</strong>
@@ -133,7 +135,7 @@ export function FeedView(props: FeedViewProps) {
                     </footer>
                   </div>
 
-                  {article.visibility === "students_only" && (
+                  {cannotSee && (
                     <div className="flex shrink-0 items-center gap-3">
                       <div className="flex size-8 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
                         <RiLockLine className="size-3.5 text-primary" />
