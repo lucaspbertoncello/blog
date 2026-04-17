@@ -1,6 +1,7 @@
 import { RiHeartLine, RiChat3Line, RiLockLine } from "@remixicon/react";
 import { Button } from "@/shared/components/common/button";
 import { AnimateIn } from "@/shared/components/custom/AnimateIn";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/common/tooltip";
 import { cn } from "@/shared/lib/utils";
 import { Link } from "@tanstack/react-router";
 import type { useFeedModel } from "./FeedModel";
@@ -136,14 +137,18 @@ export function FeedView(props: FeedViewProps) {
                   </div>
 
                   {cannotSee && (
-                    <div className="flex shrink-0 items-center gap-3">
-                      <div className="flex size-8 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
-                        <RiLockLine className="size-3.5 text-primary" />
-                      </div>
-                      <Link from="/" to="/auth/signin">
-                        <Button>Entrar</Button>
-                      </Link>
-                    </div>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex size-8 shrink-0 cursor-default items-center justify-center rounded-full border border-primary/30 bg-primary/10">
+                          <RiLockLine className="size-3.5 text-primary" />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="left">
+                        <Link from="/" to="/auth/signin" className="hover:underline">
+                          Entre na plataforma para acessar este artigo
+                        </Link>
+                      </TooltipContent>
+                    </Tooltip>
                   )}
                 </article>
               </AnimateIn>
