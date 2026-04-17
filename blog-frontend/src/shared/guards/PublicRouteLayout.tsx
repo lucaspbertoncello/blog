@@ -19,8 +19,7 @@ export function PublicRouteLayout() {
     }
 
     if (data) {
-      const { role, ...user } = data;
-      setAccountData({ role, account: user });
+      setAccountData({ account: data });
     }
   }, [isError, clearAuthTokens, data, setAccountData]);
 
