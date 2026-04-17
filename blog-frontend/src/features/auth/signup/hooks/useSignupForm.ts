@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { useSignup } from "@/domain/auth/hooks/useSignup";
+import { useNavigate } from "@tanstack/react-router";
 
 export const signupSchema = z
   .object({
@@ -15,6 +16,7 @@ export const signupSchema = z
 
 export function useSignupForm() {
   const { mutate, isPending } = useSignup();
+  const navigate = useNavigate({ from: "/signup" });
 
   const form = useForm({
     defaultValues: {
@@ -26,7 +28,7 @@ export function useSignupForm() {
       onChange: signupSchema,
     },
     onSubmit: ({ value }) => {
-      mutate(value);
+      mutate(value, { onSuccess: () => navigate({ to: "/verify-code", search: { email: value.email } }) });
     },
   });
 

@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
-import { useSearch } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useVerifyCode } from "@/domain/auth/hooks/useVerifyCode";
 
 export const verifyCodeSchema = z.object({
@@ -11,6 +11,7 @@ export const verifyCodeSchema = z.object({
 export function useVerifyCodeForm() {
   const { email = "" } = useSearch({ strict: false }) as { email?: string };
   const { mutate, isPending } = useVerifyCode();
+  const navigate = useNavigate({ from: "/verify-code" });
 
   const form = useForm({
     defaultValues: {
@@ -21,7 +22,7 @@ export function useVerifyCodeForm() {
       onChange: verifyCodeSchema,
     },
     onSubmit: ({ value }) => {
-      mutate(value);
+      mutate(value, { onSuccess: () => navigate({ to: "/signin" }) });
     },
   });
 
