@@ -11,6 +11,7 @@ import { Toaster } from "./shared/components/common/sonner";
 import { useAuthStore } from "./domain/auth/stores/useAuthStore";
 import { FeedViewModel } from "./features/feed/FeedViewModel";
 import { ProtectedRouteGuard } from "./shared/guards/ProtectedRouteLayout";
+import { PublicRouteLayout } from "./shared/guards/PublicRouteLayout";
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -26,7 +27,7 @@ const rootRoute = createRootRoute({
 const publicLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "public",
-  component: () => <Outlet />,
+  component: PublicRouteLayout,
   // beforeLoad: () => {
   //   if (useAuthStore.getState().isAuthenticated()) {
   //     throw redirect({ to: "/" });
@@ -39,7 +40,7 @@ const protectedLayoutRoute = createRoute({
   id: "protected",
   component: ProtectedRouteGuard,
   beforeLoad: ({ location }) => {
-    if (!useAuthStore.getState().isAuthenticated()) {
+    if (!useAuthStore.getState().isAuthenticated) {
       throw redirect({ to: "/auth/signin", search: { redirect: location.href } });
     }
   },

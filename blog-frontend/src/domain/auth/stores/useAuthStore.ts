@@ -1,40 +1,34 @@
 import { create } from "zustand";
-import { persist, devtools } from "zustand/middleware";
-import { decodeJwt } from "@/shared/lib/jwt";
+import { devtools } from "zustand/middleware";
 
 export type States = {
-  accessToken: string | null;
-  refreshToken: string | null;
+  isAuthenticated: boolean;
 };
 export type Actions = {
-  isAuthenticated(): boolean;
   setAuthTokens(tokens: { accessToken: string; refreshToken: string }): void;
   clearAuthTokens(): void;
+  getIsAuthenticated(): boolean;
 };
 export type AuthStore = States & Actions;
 
 export const useAuthStore = create<AuthStore>()(
   devtools(
-    persist(
-      (set, get) => ({
-        accessToken: null,
-        refreshToken: null,
-        isAuthenticated: () => {
-          const token = get().accessToken;
-          if (!token) return false;
-
-          try {
-            const { exp } = decodeJwt(token);
-            return Date.now() < exp * 1000;
-          } catch {
-            return false;
-          }
-        },
-        clearAuthTokens: () => set({ accessToken: null, refreshToken: null }),
-        setAuthTokens: ({ accessToken, refreshToken }) => set({ accessToken, refreshToken }),
-      }),
-      { name: "auth" }
-    ),
-    { name: "AuthStore" }
+    (set, get) => ({
+      isAuthenticated: !!localStorage.getItem("blog::accessToken"),
+      getIsAuthenticated: () => {
+        return get().isAuthenticated;
+      },
+      clearAuthTokens: () => {
+        set({ isAuthenticated: false });
+        localStorage.removeItem("blog::accessToken");
+        localStorage.removeItem("blog::refreshToken");
+      },
+      setAuthTokens: ({ accessToken, refreshToken }) => {
+        set({ isAuthenticated: true });
+        localStorage.setItem("blog::accessToken", accessToken);
+        localStorage.setItem("blog::refreshToken", refreshToken);
+      },
+    }),
+    { name: "auth" }
   )
 );

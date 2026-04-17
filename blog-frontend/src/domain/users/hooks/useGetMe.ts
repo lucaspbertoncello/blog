@@ -6,7 +6,7 @@ export function useGetMe() {
   const methods = useQuery({
     queryFn: getMe,
     queryKey: ["getMe"],
-    enabled: useAuthStore.getState().isAuthenticated(),
+    enabled: useAuthStore.getState().getIsAuthenticated(),
     retry: false,
   });
 

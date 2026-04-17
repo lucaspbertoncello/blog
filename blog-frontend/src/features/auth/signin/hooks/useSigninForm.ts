@@ -30,8 +30,8 @@ export function useSigninForm() {
     onSubmit: ({ value }) => {
       mutate(value, {
         onSuccess: (response) => {
-          navigate({ to: "/" });
           setAuthTokens(response);
+          navigate({ to: "/" });
         },
       });
     },

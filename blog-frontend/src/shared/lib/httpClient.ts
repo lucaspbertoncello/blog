@@ -6,8 +6,8 @@ export const httpClient = axios.create({
 });
 
 httpClient.interceptors.request.use((config) => {
-  const { isAuthenticated, accessToken } = useAuthStore.getState();
-  if (isAuthenticated()) {
+  const accessToken = localStorage.getItem("blog::accessToken");
+  if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
   return config;
