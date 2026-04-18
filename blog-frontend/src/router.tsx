@@ -13,6 +13,7 @@ import { FeedViewModel } from "./features/feed/FeedViewModel";
 import { ProtectedRouteGuard } from "./shared/guards/ProtectedRouteLayout";
 import { PublicRouteLayout } from "./shared/guards/PublicRouteLayout";
 import { ArticlePageViewModel } from "./features/articlePage/ArticlePageViewModel";
+import { FeedLayout } from "./shared/layouts/FeedLayout";
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -29,11 +30,6 @@ const publicLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "public",
   component: PublicRouteLayout,
-  // beforeLoad: () => {
-  //   if (useAuthStore.getState().isAuthenticated()) {
-  //     throw redirect({ to: "/" });
-  //   }
-  // },
 });
 
 const protectedLayoutRoute = createRoute({
@@ -53,6 +49,12 @@ const authLayoutRoute = createRoute({
   getParentRoute: () => publicLayoutRoute,
   path: "/auth",
   component: AuthLayout,
+});
+
+const feedLayoutRoute = createRoute({
+  getParentRoute: () => publicLayoutRoute,
+  id: "feed",
+  component: FeedLayout,
 });
 // -> layouts <-
 
@@ -84,13 +86,13 @@ const verifyCodeRoute = createRoute({
 
 // -> feed routes <-
 const feedRoute = createRoute({
-  getParentRoute: () => publicLayoutRoute,
+  getParentRoute: () => feedLayoutRoute,
   path: "/",
   component: FeedViewModel,
 });
 
 const articlePageRoute = createRoute({
-  getParentRoute: () => publicLayoutRoute,
+  getParentRoute: () => feedLayoutRoute,
   path: "/articles/$articleSlug",
   component: ArticlePageViewModel,
 });
@@ -98,8 +100,7 @@ const articlePageRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   publicLayoutRoute.addChildren([
-    feedRoute,
-    articlePageRoute,
+    feedLayoutRoute.addChildren([feedRoute, articlePageRoute]),
     authLayoutRoute.addChildren([signinRoute, signupRoute, verifyCodeRoute]),
   ]),
   protectedLayoutRoute.addChildren([]),

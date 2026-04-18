@@ -3,9 +3,6 @@ import { MarkdownRenderer } from "@/shared/components/custom/MarkdownRenderer";
 import { formatDate } from "@/shared/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { RiArrowLeftLine, RiCalendarLine, RiTimeLine } from "@remixicon/react";
-import { AtmosphericDepth } from "./components/AtmosphericDepth";
-import { GrainOverlay } from "./components/GrainOverlay";
-import { VerticalGridLines } from "./components/VerticalGridLines";
 import { LoadingState } from "./components/states/LoadingState";
 import { ErrorState } from "./components/states/ErrorState";
 import { NotFoundState } from "./components/states/NotFoundState";
@@ -17,12 +14,7 @@ export function ArticlePageView(props: ArticlePageViewProps) {
   const { article, getArticleError, isFetchingArticle, refetchArticle } = props;
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground">
-      <AtmosphericDepth />
-      <GrainOverlay />
-      <VerticalGridLines />
-
-      <div className="relative z-10 mx-auto max-w-250 px-12">
+    <div className="relative z-10 mx-auto max-w-250 px-12">
         <AnimateIn delay={0}>
           <header className="flex items-center justify-between border-b border-border py-9">
             <Link to="/">
@@ -119,7 +111,6 @@ export function ArticlePageView(props: ArticlePageViewProps) {
             </AnimateIn>
           </article>
         )}
-      </div>
     </div>
   );
 }
