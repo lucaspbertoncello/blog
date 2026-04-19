@@ -12,4 +12,4 @@ export type Article = {
 };
 
 export type ArticleVisibility = "public" | "students_only";
-export type ArticleStatus = "published" | "in_review" | "approved" | "rejected";
+export type ArticleStatus = "draft" | "in_review" | "published" | "rejected";
