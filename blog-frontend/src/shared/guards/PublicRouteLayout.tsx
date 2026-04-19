@@ -13,6 +13,7 @@ export function PublicRouteLayout() {
   useEffect(() => {
     if (isError) {
       clearAuthTokens();
+      setAccountData({ account: null });
       return;
     }
 

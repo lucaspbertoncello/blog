@@ -14,6 +14,7 @@ export function ProtectedRouteGuard() {
   useEffect(() => {
     if (isError) {
       clearAuthTokens();
+      setAccountData({ account: null });
       navigate({ to: "/auth/signin" });
       toast.error("Faça login novamente");
       return;
