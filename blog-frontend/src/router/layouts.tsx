@@ -1,6 +1,6 @@
 import { AuthLayout } from "@/shared/layouts/AuthLayout";
 import { createRoute } from "@tanstack/react-router";
-import { protectedLayoutRoute, publicLayoutRoute } from "./guards";
+import { publicLayoutRoute, writerLayoutRoute } from "./guards";
 import { BaseApplicationLayout } from "@/shared/layouts/BaseApplicationLayout";
 
 export const authLayoutRoute = createRoute({
@@ -16,7 +16,7 @@ export const feedLayoutRoute = createRoute({
 });
 
 export const articlesPanelLayoutRoute = createRoute({
-  getParentRoute: () => protectedLayoutRoute,
+  getParentRoute: () => writerLayoutRoute,
   id: "articles-panel",
   component: BaseApplicationLayout,
 });
