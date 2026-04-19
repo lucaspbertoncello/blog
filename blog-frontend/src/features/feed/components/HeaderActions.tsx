@@ -21,7 +21,7 @@ export function HeaderActions(props: HeaderActionsProps) {
       )}
 
       {hasWriterAccess() && (
-        <Link from="/" to="/articles/panel">
+        <Link from="/" to="/writer/articles">
           <Button variant="ghost">Acessar painel de artigos</Button>
         </Link>
       )}

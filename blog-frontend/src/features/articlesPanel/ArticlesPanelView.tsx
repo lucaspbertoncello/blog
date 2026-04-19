@@ -78,7 +78,7 @@ function RowActions({ article }: RowActionsProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          <Link to="/articles/panel/$articleId/edit" params={{ articleId: article.articleId }}>
+          <Link to="/writer/articles/$articleId/edit" params={{ articleId: article.articleId }}>
             Editar
           </Link>
         </DropdownMenuItem>
@@ -152,7 +152,7 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
           <span className="font-sans text-sm font-bold tracking-tight">
             dev<span className="text-primary">.</span>blog
           </span>
-          <Link to="/articles/panel/new">
+          <Link to="/writer/articles/new">
             <Button size="sm" className="gap-1.5">
               <RiAddLine className="size-4" />
               Novo artigo

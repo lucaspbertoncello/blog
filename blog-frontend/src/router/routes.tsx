@@ -53,19 +53,19 @@ export const articlePageRoute = createRoute({
 
 export const articlesPanelRoute = createRoute({
   getParentRoute: () => articlesPanelLayoutRoute,
-  path: "/articles/panel",
+  path: "/writer/articles",
   component: ArticlesPanelViewModel,
 });
 
 export const articleEditorNewRoute = createRoute({
   getParentRoute: () => articlesPanelLayoutRoute,
-  path: "/articles/panel/new",
+  path: "/writer/articles/new",
   component: ArticleEditorViewModel,
 });
 
 export const articleEditorEditRoute = createRoute({
   getParentRoute: () => articlesPanelLayoutRoute,
-  path: "/articles/panel/$articleId/edit",
+  path: "/writer/articles/$articleId/edit",
   component: ArticleEditorViewModel,
 });
 

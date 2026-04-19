@@ -37,7 +37,7 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
       <AnimateIn delay={0}>
         <header className="flex items-center justify-between border-b border-border py-9">
           <Link
-            to="/articles/panel"
+            to="/writer/articles"
             className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/50 transition-colors hover:text-foreground"
           >
             <RiArrowLeftLine className="size-3.5" />
