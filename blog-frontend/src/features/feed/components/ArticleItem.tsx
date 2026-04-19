@@ -1,5 +1,5 @@
 import { cn, formatDate } from "@/shared/lib/utils";
-import { RiChat3Line, RiHeartLine, RiLockLine } from "@remixicon/react";
+import { RiLockLine } from "@remixicon/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/common/tooltip";
 import { Link } from "@tanstack/react-router";
 import type { Article } from "@/domain/articles/types/Article";
@@ -52,18 +52,6 @@ export function ArticleItem(props: ArticleItemProps) {
               {formatDate(article.createdAt)}
             </span>
 
-            {article.visibility !== "students_only" && (
-              <div className="flex gap-4">
-                <button className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/30 transition-colors hover:text-primary">
-                  <RiHeartLine className="size-3.5" />
-                  32
-                </button>
-
-                <button className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/30 transition-colors hover:text-primary">
-                  <RiChat3Line className="size-3.5" />2
-                </button>
-              </div>
-            )}
           </footer>
         </div>
 

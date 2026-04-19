@@ -2,7 +2,7 @@ import { AnimateIn } from "@/shared/components/custom/AnimateIn";
 import { MarkdownRenderer } from "@/shared/components/custom/MarkdownRenderer";
 import { formatDate } from "@/shared/lib/utils";
 import { Link } from "@tanstack/react-router";
-import { RiArrowLeftLine, RiCalendarLine, RiTimeLine } from "@remixicon/react";
+import { RiArrowLeftLine, RiCalendarLine, RiChat3Line, RiHeartLine, RiTimeLine } from "@remixicon/react";
 import { LoadingState } from "./components/states/LoadingState";
 import { ErrorState } from "./components/states/ErrorState";
 import { NotFoundState } from "./components/states/NotFoundState";
@@ -88,12 +88,25 @@ export function ArticlePageView(props: ArticlePageViewProps) {
             </AnimateIn>
 
             <AnimateIn delay={320}>
+              <div className="mt-5 flex items-center gap-5">
+                <button className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/30 transition-colors hover:text-primary">
+                  <RiHeartLine className="size-3.5" />
+                  32
+                </button>
+                <button className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/30 transition-colors hover:text-primary">
+                  <RiChat3Line className="size-3.5" />
+                  2
+                </button>
+              </div>
+            </AnimateIn>
+
+            <AnimateIn delay={380}>
               <div className="mt-8">
                 <MarkdownRenderer content={article.content} />
               </div>
             </AnimateIn>
 
-            <AnimateIn delay={400}>
+            <AnimateIn delay={460}>
               <div className="mt-12 border-t border-border pt-8">
                 <div className="flex items-center justify-between">
                   <span className="font-inter text-xs text-muted-foreground/40">
