@@ -1,8 +1,7 @@
 import { AuthLayout } from "@/shared/layouts/AuthLayout";
-import { FeedLayout } from "@/shared/layouts/FeedLayout";
 import { createRoute } from "@tanstack/react-router";
 import { protectedLayoutRoute, publicLayoutRoute } from "./guards";
-import { ArticlesPanelLayout } from "@/shared/layouts/ArticlesPanelLayout";
+import { BaseApplicationLayout } from "@/shared/layouts/BaseApplicationLayout";
 
 export const authLayoutRoute = createRoute({
   getParentRoute: () => publicLayoutRoute,
@@ -13,11 +12,11 @@ export const authLayoutRoute = createRoute({
 export const feedLayoutRoute = createRoute({
   getParentRoute: () => publicLayoutRoute,
   id: "feed",
-  component: FeedLayout,
+  component: BaseApplicationLayout,
 });
 
 export const articlesPanelLayoutRoute = createRoute({
   getParentRoute: () => protectedLayoutRoute,
   id: "articles-panel",
-  component: ArticlesPanelLayout,
+  component: BaseApplicationLayout,
 });

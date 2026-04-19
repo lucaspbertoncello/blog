@@ -3,7 +3,7 @@ import { AtmosphericDepth } from "@/shared/components/custom/AtmosphericDepth";
 import { GrainOverlay } from "@/shared/components/custom/GrainOverlay";
 import { VerticalGridLines } from "@/shared/components/custom/VerticalGridLines";
 
-export function ArticlesPanelLayout() {
+export function BaseApplicationLayout() {
   return (
     <div className="relative min-h-screen bg-background text-foreground">
       <AtmosphericDepth />
