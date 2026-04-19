@@ -78,7 +78,6 @@ function RowActions({ article }: RowActionsProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          {/* @ts-expect-error route not yet registered */}
           <Link to="/articles/panel/$articleId/edit" params={{ articleId: article.articleId }}>
             Editar
           </Link>

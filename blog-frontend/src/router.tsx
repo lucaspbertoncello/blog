@@ -16,6 +16,7 @@ import { ArticlePageViewModel } from "./features/articlePage/ArticlePageViewMode
 import { FeedLayout } from "./shared/layouts/FeedLayout";
 import { ArticlesPanelLayout } from "./shared/layouts/ArticlesPanelLayout";
 import { ArticlesPanelViewModel } from "./features/articlesPanel/ArticlesPanelViewModel";
+import { ArticleEditorViewModel } from "./features/articleEditor/ArticleEditorViewModel";
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -56,6 +57,18 @@ const articlesPanelRoute = createRoute({
   getParentRoute: () => articlesPanelLayoutRoute,
   path: "/articles/panel",
   component: ArticlesPanelViewModel,
+});
+
+const articleEditorNewRoute = createRoute({
+  getParentRoute: () => articlesPanelLayoutRoute,
+  path: "/articles/panel/new",
+  component: ArticleEditorViewModel,
+});
+
+const articleEditorEditRoute = createRoute({
+  getParentRoute: () => articlesPanelLayoutRoute,
+  path: "/articles/panel/$articleId/edit",
+  component: ArticleEditorViewModel,
 });
 
 // -> layouts <-
@@ -118,7 +131,11 @@ const routeTree = rootRoute.addChildren([
     authLayoutRoute.addChildren([signinRoute, signupRoute, verifyCodeRoute]),
   ]),
   protectedLayoutRoute.addChildren([
-    articlesPanelLayoutRoute.addChildren([articlesPanelRoute]),
+    articlesPanelLayoutRoute.addChildren([
+      articlesPanelRoute,
+      articleEditorNewRoute,
+      articleEditorEditRoute,
+    ]),
   ]),
 ]);
 
