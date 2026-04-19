@@ -11,7 +11,7 @@ export function TagInput({ tags, onAdd, onRemove }: TagInputProps) {
   const [input, setInput] = useState("");
 
   function confirm() {
-    const trimmed = input.trim().toLowerCase().replace(/\s+/g, "-");
+    const trimmed = input.trim().toLowerCase().replace(/[,\s]+/g, "-");
     if (trimmed && !tags.includes(trimmed)) {
       onAdd(trimmed);
     }

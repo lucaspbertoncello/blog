@@ -100,15 +100,13 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
           <textarea
             ref={textareaRef}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => {
+              setContent(e.target.value);
+              e.target.style.height = "auto";
+              e.target.style.height = e.target.scrollHeight + "px";
+            }}
             placeholder="Escreva seu conteúdo em markdown..."
             className="mt-4 min-h-96 w-full resize-none bg-transparent font-mono text-sm leading-7 text-foreground/80 outline-none placeholder:text-muted-foreground/20"
-            style={{ height: "auto" }}
-            onInput={(e) => {
-              const t = e.currentTarget;
-              t.style.height = "auto";
-              t.style.height = t.scrollHeight + "px";
-            }}
           />
         </div>
       </AnimateIn>
