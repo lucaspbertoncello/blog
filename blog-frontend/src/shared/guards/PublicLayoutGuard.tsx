@@ -4,7 +4,7 @@ import { useUserStore } from "@/domain/users/stores/useUserStore";
 import { Outlet } from "@tanstack/react-router";
 import { useEffect } from "react";
 
-export function PublicRouteLayout() {
+export function PublicLayoutGuard() {
   const { data, isError } = useGetMe();
 
   const clearAuthTokens = useAuthStore((state) => state.clearAuthTokens);

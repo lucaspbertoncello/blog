@@ -5,7 +5,7 @@ import { Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
-export function ProtectedRouteGuard() {
+export function ProtectedLayoutGuard() {
   const { data, isError } = useGetMe();
   const navigate = useNavigate();
   const clearAuthTokens = useAuthStore((state) => state.clearAuthTokens);
