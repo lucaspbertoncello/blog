@@ -14,6 +14,8 @@ import { ProtectedRouteGuard } from "./shared/guards/ProtectedRouteLayout";
 import { PublicRouteLayout } from "./shared/guards/PublicRouteLayout";
 import { ArticlePageViewModel } from "./features/articlePage/ArticlePageViewModel";
 import { FeedLayout } from "./shared/layouts/FeedLayout";
+import { ArticlesPanelLayout } from "./shared/layouts/ArticlesPanelLayout";
+import { ArticlesPanelViewModel } from "./features/articlesPanel/ArticlesPanelViewModel";
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -43,6 +45,18 @@ const protectedLayoutRoute = createRoute({
   },
 });
 // -> guards <-
+
+const articlesPanelLayoutRoute = createRoute({
+  getParentRoute: () => protectedLayoutRoute,
+  id: "articles-panel",
+  component: ArticlesPanelLayout,
+});
+
+const articlesPanelRoute = createRoute({
+  getParentRoute: () => articlesPanelLayoutRoute,
+  path: "/articles/panel",
+  component: ArticlesPanelViewModel,
+});
 
 // -> layouts <-
 const authLayoutRoute = createRoute({
@@ -103,7 +117,9 @@ const routeTree = rootRoute.addChildren([
     feedLayoutRoute.addChildren([feedRoute, articlePageRoute]),
     authLayoutRoute.addChildren([signinRoute, signupRoute, verifyCodeRoute]),
   ]),
-  protectedLayoutRoute.addChildren([]),
+  protectedLayoutRoute.addChildren([
+    articlesPanelLayoutRoute.addChildren([articlesPanelRoute]),
+  ]),
 ]);
 
 export const router = createRouter({ routeTree });
