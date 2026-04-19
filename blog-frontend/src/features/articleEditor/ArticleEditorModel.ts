@@ -99,7 +99,7 @@ export function useArticleEditorModel(articleId?: string) {
       const start = ta.selectionStart;
       const newContent =
         content.substring(0, start) + insertText + content.substring(start);
-      setContent(newContent);
+      handleInsert({ value: newContent, selectionStart: start + insertText.length, selectionEnd: start + insertText.length });
     }
 
     e.target.value = "";
