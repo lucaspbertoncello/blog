@@ -22,6 +22,16 @@ export const protectedLayoutRoute = createRoute({
   },
 });
 
+export const authGuardRoute = createRoute({
+  getParentRoute: () => publicLayoutRoute,
+  id: "auth-guard",
+  beforeLoad: () => {
+    if (useAuthStore.getState().isAuthenticated) {
+      throw redirect({ to: "/" });
+    }
+  },
+});
+
 export const writerLayoutRoute = createRoute({
   getParentRoute: () => protectedLayoutRoute,
   id: "writer",

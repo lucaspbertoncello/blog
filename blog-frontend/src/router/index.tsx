@@ -3,7 +3,7 @@ import { queryClient } from "@/shared/lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createRootRoute, createRouter, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import { protectedLayoutRoute, publicLayoutRoute, writerLayoutRoute } from "./guards";
+import { authGuardRoute, protectedLayoutRoute, publicLayoutRoute, writerLayoutRoute } from "./guards";
 import { articlesPanelLayoutRoute, authLayoutRoute, feedLayoutRoute } from "./layouts";
 import {
   articleEditorEditRoute,
@@ -29,7 +29,9 @@ export const rootRoute = createRootRoute({
 const routeTree = rootRoute.addChildren([
   publicLayoutRoute.addChildren([
     feedLayoutRoute.addChildren([feedRoute, articlePageRoute]),
-    authLayoutRoute.addChildren([signinRoute, signupRoute, verifyCodeRoute]),
+    authGuardRoute.addChildren([
+      authLayoutRoute.addChildren([signinRoute, signupRoute, verifyCodeRoute]),
+    ]),
   ]),
   protectedLayoutRoute.addChildren([
     writerLayoutRoute.addChildren([

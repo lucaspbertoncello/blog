@@ -1,10 +1,10 @@
 import { AuthLayout } from "@/shared/layouts/AuthLayout";
 import { createRoute } from "@tanstack/react-router";
-import { publicLayoutRoute, writerLayoutRoute } from "./guards";
+import { authGuardRoute, publicLayoutRoute, writerLayoutRoute } from "./guards";
 import { BaseApplicationLayout } from "@/shared/layouts/BaseApplicationLayout";
 
 export const authLayoutRoute = createRoute({
-  getParentRoute: () => publicLayoutRoute,
+  getParentRoute: () => authGuardRoute,
   path: "/auth",
   component: AuthLayout,
 });
