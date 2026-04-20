@@ -13,7 +13,15 @@ export type ArticleEditorViewProps = ReturnType<typeof useArticleEditorModel>;
 
 export function ArticleEditorView(props: ArticleEditorViewProps) {
   const { articleForm, editor, isEditing } = props;
-  const { form, previewOpen, setPreviewOpen, handleSubmit, isPending } = articleForm;
+  const {
+    form,
+    previewOpen,
+    setPreviewOpen,
+    handleSubmit,
+    isSavingArticleToDraft,
+    isSubmittingArticle,
+    isSavingExistingArticle,
+  } = articleForm;
   const { textareaRef, handleInsert } = editor;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -36,22 +44,30 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
             <span className="font-inter text-xs text-muted-foreground/40">
               {isEditing ? "Editando artigo" : "Novo artigo"}
             </span>
-            <form.Subscribe selector={(state) => state.canSubmit}>
-              {(canSubmit) => (
+            <form.Subscribe>
+              {!isEditing ? (
+                <Button
+                  size="sm"
+                  isLoading={isSavingArticleToDraft}
+                  onClick={() => handleSubmit({ articleActionType: "saveToDrafts" })}
+                >
+                  Criar como rascunho
+                </Button>
+              ) : (
                 <>
                   <Button
-                    variant="ghost"
                     size="sm"
-                    disabled={isPending}
-                    onClick={() => handleSubmit("draft")}
+                    variant="ghost"
+                    isLoading={isSavingExistingArticle}
+                    onClick={() => handleSubmit({ articleActionType: "saveExistingArticle" })}
                   >
-                    Salvar rascunho
+                    Salvar artigo
                   </Button>
+
                   <Button
                     size="sm"
-                    disabled={!canSubmit || isPending}
-                    onClick={() => handleSubmit("review")}
-                    className="border border-primary/20 bg-primary/10 text-primary hover:bg-primary/20"
+                    isLoading={isSubmittingArticle}
+                    onClick={() => handleSubmit({ articleActionType: "submitArticleToRevision" })}
                   >
                     Enviar para revisão
                   </Button>
@@ -81,9 +97,7 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
                   className="w-full resize-none overflow-hidden bg-transparent font-sans text-3xl font-bold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/20"
                 />
                 {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
-                  <p className="mt-1 text-xs text-destructive">
-                    {getFieldError(field.state.meta.errors[0])}
-                  </p>
+                  <p className="mt-1 text-xs text-destructive">{getFieldError(field.state.meta.errors[0])}</p>
                 )}
               </div>
             )}
@@ -134,9 +148,7 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
                   className="mt-4 min-h-96 w-full resize-none bg-transparent font-mono text-sm leading-7 text-foreground/80 outline-none placeholder:text-muted-foreground/20"
                 />
                 {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
-                  <p className="mt-1 text-xs text-destructive">
-                    {getFieldError(field.state.meta.errors[0])}
-                  </p>
+                  <p className="mt-1 text-xs text-destructive">{getFieldError(field.state.meta.errors[0])}</p>
                 )}
               </div>
             )}

@@ -36,7 +36,7 @@ export function useArticleEditorModel(articleId?: string) {
     ? (MOCK_FULL_ARTICLES.find((a) => a.articleId === articleId) ?? null)
     : null;
 
-  const articleForm = useArticleEditorForm({ articleBeingEdited });
+  const articleForm = useArticleEditorForm({ articleBeingEdited, articleId });
   const editor = useEditorContent((v) => articleForm.form.setFieldValue("content", v));
 
   return {

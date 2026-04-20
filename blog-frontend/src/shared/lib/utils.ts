@@ -12,3 +12,12 @@ export function formatDate(iso: string): string {
     year: "numeric",
   }).format(new Date(iso));
 }
+
+export function slugify(title: string) {
+  return title
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
