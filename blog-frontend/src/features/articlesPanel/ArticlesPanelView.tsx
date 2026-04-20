@@ -153,18 +153,18 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
             dev<span className="text-primary">.</span>blog
           </span>
           <div className="flex items-center gap-2">
-            <Link to="/">
-              <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
+            <Button asChild variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
+              <Link to="/">
                 <RiArrowLeftLine className="size-4" />
                 Feed
-              </Button>
-            </Link>
-            <Link to="/writer/articles/new">
-              <Button size="sm" className="gap-1.5">
+              </Link>
+            </Button>
+            <Button asChild size="sm" className="gap-1.5">
+              <Link to="/writer/articles/new">
                 <RiAddLine className="size-4" />
                 Novo artigo
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </header>
       </AnimateIn>
