@@ -31,10 +31,10 @@ export function MetadataRow({
         value={visibility}
         onValueChange={(v) => onVisibilityChange(v as ArticleVisibility)}
       >
-        <SelectTrigger className="h-auto w-auto gap-1 border-0 bg-transparent p-0 font-inter text-xs text-muted-foreground shadow-none focus:ring-0">
+        <SelectTrigger className="h-auto w-auto gap-1 rounded-4xl border-0 bg-transparent px-3 py-1 font-inter text-xs text-muted-foreground shadow-none focus:ring-0">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="p-1">
           <SelectItem value="public">
             <span className="font-inter text-xs">público</span>
           </SelectItem>
