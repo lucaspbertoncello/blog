@@ -5,16 +5,9 @@ import { createRootRoute, createRouter, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { authGuardRoute, protectedLayoutRoute, publicLayoutRoute, writerLayoutRoute } from "./guards";
 import { articlesPanelLayoutRoute, authLayoutRoute, feedLayoutRoute } from "./layouts";
-import {
-  articleEditorEditRoute,
-  articleEditorNewRoute,
-  articlePageRoute,
-  articlesPanelRoute,
-  feedRoute,
-  signinRoute,
-  signupRoute,
-  verifyCodeRoute,
-} from "./routes";
+import { signinRoute, signupRoute, verifyCodeRoute } from "./routes/auth";
+import { feedRoute, articlePageRoute } from "./routes/feed";
+import { articlesPanelRoute, articleEditorNewRoute, articleEditorEditRoute } from "./routes/writerPanel";
 
 export const rootRoute = createRootRoute({
   component: () => (
