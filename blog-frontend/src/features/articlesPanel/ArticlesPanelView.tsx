@@ -50,8 +50,8 @@ const STATUS_FILTERS: Array<ArticleStatus | "all"> = [
 function StatusBadge({ status }: { status: ArticleStatus }) {
   const variants: Record<ArticleStatus, string> = {
     draft: "bg-muted/50 text-muted-foreground border-border",
-    in_review: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    published: "bg-green-500/10 text-green-400 border-green-500/20",
+    in_review: "bg-sky-500/10 text-sky-400 border-sky-500/20",
+    published: "bg-primary/10 text-primary border-primary/20",
     rejected: "bg-red-500/10 text-red-400 border-red-500/20",
   };
   return (

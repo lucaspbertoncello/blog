@@ -1,7 +1,9 @@
+import { useRef } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/shared/components/common/button";
 import { AnimateIn } from "@/shared/components/custom/AnimateIn";
 import { RiArrowLeftLine } from "@remixicon/react";
+import { getFieldError } from "@/shared/lib/form";
 import { EditorToolbar } from "./components/EditorToolbar";
 import { MetadataRow } from "./components/MetadataRow";
 import { PreviewModal } from "./components/PreviewModal";
@@ -10,27 +12,12 @@ import type { useArticleEditorModel } from "./ArticleEditorModel";
 export type ArticleEditorViewProps = ReturnType<typeof useArticleEditorModel>;
 
 export function ArticleEditorView(props: ArticleEditorViewProps) {
-  const {
-    title,
-    setTitle,
-    content,
-    setContent,
-    tags,
-    setTags,
-    visibility,
-    setVisibility,
-    previewOpen,
-    setPreviewOpen,
-    textareaRef,
-    fileInputRef,
-    handleInsert,
-    handleSaveDraft,
-    handleSubmitForReview,
-    handleImageUpload,
-    handleFileSelected,
-    canSubmit,
-    isEditing,
-  } = props;
+  const { articleForm, editor, isEditing } = props;
+  const { form, previewOpen, setPreviewOpen, handleSubmit, isPending } = articleForm;
+  const { textareaRef, handleInsert } = editor;
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleImageUpload = () => fileInputRef.current?.click();
 
   return (
     <div className="relative z-10 mx-auto max-w-250 px-12">
@@ -49,17 +36,28 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
             <span className="font-inter text-xs text-muted-foreground/40">
               {isEditing ? "Editando artigo" : "Novo artigo"}
             </span>
-            <Button variant="ghost" size="sm" onClick={handleSaveDraft}>
-              Salvar rascunho
-            </Button>
-            <Button
-              size="sm"
-              disabled={!canSubmit}
-              onClick={handleSubmitForReview}
-              className="bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20"
-            >
-              Enviar para revisão
-            </Button>
+            <form.Subscribe selector={(state) => state.canSubmit}>
+              {(canSubmit) => (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={isPending}
+                    onClick={() => handleSubmit("draft")}
+                  >
+                    Salvar rascunho
+                  </Button>
+                  <Button
+                    size="sm"
+                    disabled={!canSubmit || isPending}
+                    onClick={() => handleSubmit("review")}
+                    className="border border-primary/20 bg-primary/10 text-primary hover:bg-primary/20"
+                  >
+                    Enviar para revisão
+                  </Button>
+                </>
+              )}
+            </form.Subscribe>
           </div>
         </header>
       </AnimateIn>
@@ -67,26 +65,48 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
       <AnimateIn delay={60}>
         <div className="mx-auto max-w-4xl py-8">
           {/* Title */}
-          <textarea
-            rows={1}
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-              e.target.style.height = "auto";
-              e.target.style.height = e.target.scrollHeight + "px";
-            }}
-            placeholder="Título do artigo..."
-            className="w-full resize-none overflow-hidden bg-transparent font-sans text-3xl font-bold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/20"
-          />
+          <form.Field name="title">
+            {(field) => (
+              <div>
+                <textarea
+                  rows={1}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    e.target.style.height = "auto";
+                    e.target.style.height = e.target.scrollHeight + "px";
+                  }}
+                  placeholder="Título do artigo..."
+                  className="w-full resize-none overflow-hidden bg-transparent font-sans text-3xl font-bold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/20"
+                />
+                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                  <p className="mt-1 text-xs text-destructive">
+                    {getFieldError(field.state.meta.errors[0])}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
 
           {/* Metadata row */}
-          <MetadataRow
-            tags={tags}
-            visibility={visibility}
-            onAddTag={(tag) => setTags((prev) => [...prev, tag])}
-            onRemoveTag={(tag) => setTags((prev) => prev.filter((t) => t !== tag))}
-            onVisibilityChange={setVisibility}
-          />
+          <form.Field name="tags">
+            {(tagsField) => (
+              <form.Field name="visibility">
+                {(visibilityField) => (
+                  <MetadataRow
+                    tags={tagsField.state.value}
+                    visibility={visibilityField.state.value}
+                    onAddTag={(tag) => tagsField.handleChange([...tagsField.state.value, tag])}
+                    onRemoveTag={(tag) =>
+                      tagsField.handleChange(tagsField.state.value.filter((t) => t !== tag))
+                    }
+                    onVisibilityChange={(v) => visibilityField.handleChange(v)}
+                  />
+                )}
+              </form.Field>
+            )}
+          </form.Field>
 
           {/* Toolbar */}
           <EditorToolbar
@@ -97,35 +117,46 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
           />
 
           {/* Editor */}
-          <textarea
-            ref={textareaRef}
-            value={content}
-            onChange={(e) => {
-              setContent(e.target.value);
-              e.target.style.height = "auto";
-              e.target.style.height = e.target.scrollHeight + "px";
-            }}
-            placeholder="Escreva seu conteúdo em markdown..."
-            className="mt-4 min-h-96 w-full resize-none bg-transparent font-mono text-sm leading-7 text-foreground/80 outline-none placeholder:text-muted-foreground/20"
-          />
+          <form.Field name="content">
+            {(field) => (
+              <div>
+                <textarea
+                  ref={textareaRef}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    e.target.style.height = "auto";
+                    e.target.style.height = e.target.scrollHeight + "px";
+                  }}
+                  spellCheck={false}
+                  placeholder="Escreva seu conteúdo em markdown..."
+                  className="mt-4 min-h-96 w-full resize-none bg-transparent font-mono text-sm leading-7 text-foreground/80 outline-none placeholder:text-muted-foreground/20"
+                />
+                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                  <p className="mt-1 text-xs text-destructive">
+                    {getFieldError(field.state.meta.errors[0])}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
         </div>
       </AnimateIn>
 
       {/* Hidden file input for image upload */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/png,image/jpeg"
-        className="hidden"
-        onChange={handleFileSelected}
-      />
+      <input ref={fileInputRef} type="file" accept="image/png,image/jpeg" className="hidden" />
 
-      <PreviewModal
-        open={previewOpen}
-        onClose={() => setPreviewOpen(false)}
-        title={title}
-        content={content}
-      />
+      <form.Subscribe selector={(state) => ({ title: state.values.title, content: state.values.content })}>
+        {({ title, content }) => (
+          <PreviewModal
+            open={previewOpen}
+            onClose={() => setPreviewOpen(false)}
+            title={title}
+            content={content}
+          />
+        )}
+      </form.Subscribe>
     </div>
   );
 }
