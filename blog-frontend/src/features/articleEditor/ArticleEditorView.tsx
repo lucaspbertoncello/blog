@@ -159,13 +159,14 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
       {/* Hidden file input for image upload */}
       <input ref={fileInputRef} type="file" accept="image/png,image/jpeg" className="hidden" />
 
-      <form.Subscribe selector={(state) => ({ title: state.values.title, content: state.values.content })}>
-        {({ title, content }) => (
+      <form.Subscribe selector={(state) => ({ title: state.values.title, content: state.values.content, tags: state.values.tags })}>
+        {({ title, content, tags }) => (
           <PreviewModal
             open={previewOpen}
             onClose={() => setPreviewOpen(false)}
             title={title}
             content={content}
+            tags={tags}
           />
         )}
       </form.Subscribe>
