@@ -10,7 +10,7 @@ export const verifyCodeSchema = z.object({
 
 export function useVerifyCodeForm() {
   // beforeLoad in the route guarantees email is a valid string at this point
-  const { email } = useSearch({ strict: true, from: "/public/auth/verify-code" });
+  const { email } = useSearch({ strict: true, from: "/public/auth-guard/auth/verify-code" });
   const { mutate, isPending } = useVerifyCode();
   const navigate = useNavigate({ from: "/auth/verify-code" });
 
