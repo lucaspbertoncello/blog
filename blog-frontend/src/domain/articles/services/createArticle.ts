@@ -9,5 +9,5 @@ export async function createArticle(params: CreateArticleService.Params) {
 
 export namespace CreateArticleService {
   export type Params = Pick<Article, "content" | "slug" | "title" | "tags" | "visibility">;
-  export type Response = void;
+  export type Response = { articleId: string };
 }
