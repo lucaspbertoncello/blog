@@ -16,6 +16,15 @@ editArticle:
         authorizer:
           name: jwtAuthorizer
 
+deleteArticle:
+  handler: src/functions/articles/deleteArticle.handler
+  events:
+    - httpApi:
+        method: DELETE
+        path: /articles/{articleId}
+        authorizer:
+          name: jwtAuthorizer
+
 submitArticle:
   handler: src/functions/articles/submitArticle.handler
   events:
@@ -49,6 +58,15 @@ listPublishedArticles:
     - httpApi:
         method: GET
         path: /articles/feed
+
+listAccountArticles:
+  handler: src/functions/articles/listAccountArticles.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /accounts/{accountId}/articles
+        authorizer:
+          name: jwtAuthorizer
 
 listArticlesByStatus:
   handler: src/functions/articles/listArticlesByStatus.handler
