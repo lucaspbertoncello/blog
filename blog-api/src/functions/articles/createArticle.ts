@@ -57,6 +57,7 @@ export const handler = lambdaHttpAdapter<"private", CreateArticle.Params, Create
 
     return {
       statusCode: 201,
+      body: { articleId },
     };
   },
   { schema: schema, requiredRoles: ["writer", "admin"], errorMapper: dynamoErrorMapper },
@@ -64,5 +65,5 @@ export const handler = lambdaHttpAdapter<"private", CreateArticle.Params, Create
 
 export namespace CreateArticle {
   export type Params = z.infer<typeof schema>;
-  export type Response = void;
+  export type Response = { articleId: string };
 }
