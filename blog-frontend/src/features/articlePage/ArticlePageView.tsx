@@ -18,7 +18,7 @@ export function ArticlePageView(props: ArticlePageViewProps) {
         <AnimateIn delay={0}>
           <header className="flex items-center justify-between border-b border-border py-9">
             <Link to="/">
-              <span className="font-sans text-sm font-bold tracking-tight">
+              <span className="font-sans text-base font-light tracking-tight">
                 dev<span className="text-primary">.</span>blog
               </span>
             </Link>

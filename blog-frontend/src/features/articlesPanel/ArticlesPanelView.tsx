@@ -22,7 +22,7 @@ import {
 import { Button } from "@/shared/components/common/button";
 import { Input } from "@/shared/components/common/input";
 import { AnimateIn } from "@/shared/components/custom/AnimateIn";
-import { RiAddLine, RiMoreLine } from "@remixicon/react";
+import { RiAddLine, RiArrowLeftLine, RiMoreLine } from "@remixicon/react";
 import { formatDate } from "@/shared/lib/utils";
 import { Link } from "@tanstack/react-router";
 import type { useArticlesPanelModel } from "./ArticlesPanelModel";
@@ -149,9 +149,17 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
     <div className="relative z-10 mx-auto max-w-250 px-12">
       <AnimateIn delay={0}>
         <header className="flex items-center justify-between border-b border-border py-9">
-          <span className="font-sans text-sm font-bold tracking-tight">
-            dev<span className="text-primary">.</span>blog
-          </span>
+          <div className="flex items-center gap-4">
+            <Link to="/">
+              <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
+                <RiArrowLeftLine className="size-4" />
+                Feed
+              </Button>
+            </Link>
+            <span className="font-sans text-base font-light tracking-tight">
+              dev<span className="text-primary">.</span>blog
+            </span>
+          </div>
           <Link to="/writer/articles/new">
             <Button size="sm" className="gap-1.5">
               <RiAddLine className="size-4" />
