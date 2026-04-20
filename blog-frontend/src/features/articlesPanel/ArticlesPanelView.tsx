@@ -149,23 +149,23 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
     <div className="relative z-10 mx-auto max-w-250 px-12">
       <AnimateIn delay={0}>
         <header className="flex items-center justify-between border-b border-border py-9">
-          <div className="flex items-center gap-4">
+          <span className="font-sans text-base font-light tracking-tight">
+            dev<span className="text-primary">.</span>blog
+          </span>
+          <div className="flex items-center gap-2">
             <Link to="/">
               <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
                 <RiArrowLeftLine className="size-4" />
                 Feed
               </Button>
             </Link>
-            <span className="font-sans text-base font-light tracking-tight">
-              dev<span className="text-primary">.</span>blog
-            </span>
+            <Link to="/writer/articles/new">
+              <Button size="sm" className="gap-1.5">
+                <RiAddLine className="size-4" />
+                Novo artigo
+              </Button>
+            </Link>
           </div>
-          <Link to="/writer/articles/new">
-            <Button size="sm" className="gap-1.5">
-              <RiAddLine className="size-4" />
-              Novo artigo
-            </Button>
-          </Link>
         </header>
       </AnimateIn>
 
