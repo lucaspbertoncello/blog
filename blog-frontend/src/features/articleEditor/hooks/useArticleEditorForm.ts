@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm, useStore } from "@tanstack/react-form";
 import { z } from "zod";
 import type { Article } from "@/domain/articles/types/Article";
 import { useCreateArticle } from "@/domain/articles/hooks/useCreateArticle";
 import { useSubmitArticleToReview } from "@/domain/articles/hooks/useSubmitArticleToReview";
 import { slugify } from "@/shared/lib/utils";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useBlocker } from "@tanstack/react-router";
 import { useEditArticle } from "@/domain/articles/hooks/useEditArticle";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -30,6 +30,7 @@ export type useArticleEditorFormProps = {
 
 export function useArticleEditorForm({ articleBeingEdited, articleId }: useArticleEditorFormProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
+  const isSavingRef = useRef(false);
 
   const queryClient = useQueryClient();
 
@@ -56,8 +57,10 @@ export function useArticleEditorForm({ articleBeingEdited, articleId }: useArtic
 
       if (articleActionType === "saveToDrafts") {
         const { articleId } = await createArticle.mutateAsync({ content, title, tags, visibility, slug });
+        isSavingRef.current = true;
         navigate({ to: "/writer/articles/$articleId/edit", params: { articleId } });
         form.reset({ content, tags, title, visibility });
+        isSavingRef.current = false;
       }
 
       if (articleActionType === "submitArticleToRevision") {
@@ -77,6 +80,15 @@ export function useArticleEditorForm({ articleBeingEdited, articleId }: useArtic
   });
 
   const isFieldsDirty = useStore(form.store, (state) => state.isDirty);
+
+  useBlocker({
+    shouldBlockFn: () => {
+      if (!isFieldsDirty || isSavingRef.current) return false;
+      const shouldLeave = confirm("Você tem alterações não salvas. Deseja sair mesmo assim?");
+      return !shouldLeave;
+    },
+    enableBeforeUnload: isFieldsDirty,
+  });
 
   // Sync fetched article into form when data loads asynchronously.
   // Uses reset() instead of setFieldValue() so defaultValues are updated — isDirty stays false until user edits.
