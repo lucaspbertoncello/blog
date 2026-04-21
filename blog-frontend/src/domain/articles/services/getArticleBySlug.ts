@@ -2,7 +2,7 @@ import { httpClient } from "@/shared/lib/httpClient";
 import type { Article } from "../types/Article";
 
 export async function getArticleBySlug(params: GetPublicArticleBySlug.Params) {
-  const baseUrl = params.isAuthenticated ? "/articles" : "/articles/public";
+  const baseUrl = params.isAuthenticated ? "/articles/slug" : "/articles/public";
 
   const { data } = await httpClient.get<GetPublicArticleBySlug.Response>(`${baseUrl}/${params.articleSlug}`);
   return data;
