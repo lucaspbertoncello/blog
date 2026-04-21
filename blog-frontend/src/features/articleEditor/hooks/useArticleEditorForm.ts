@@ -1,12 +1,13 @@
-import { useState } from "react";
-import { useForm } from "@tanstack/react-form";
+import { useState, useEffect } from "react";
+import { useForm, useStore } from "@tanstack/react-form";
 import { z } from "zod";
-import type { Article, ArticleVisibility } from "@/domain/articles/types/Article";
+import type { Article } from "@/domain/articles/types/Article";
 import { useCreateArticle } from "@/domain/articles/hooks/useCreateArticle";
 import { useSubmitArticleToReview } from "@/domain/articles/hooks/useSubmitArticleToReview";
 import { slugify } from "@/shared/lib/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { useEditArticle } from "@/domain/articles/hooks/useEditArticle";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const articleEditorSchema = z.object({
   title: z.string().min(1, "Título obrigatório"),
@@ -30,6 +31,8 @@ export type useArticleEditorFormProps = {
 export function useArticleEditorForm({ articleBeingEdited, articleId }: useArticleEditorFormProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
 
+  const queryClient = useQueryClient();
+
   const createArticle = useCreateArticle();
   const submitForReview = useSubmitArticleToReview();
   const editArticle = useEditArticle();
@@ -37,12 +40,6 @@ export function useArticleEditorForm({ articleBeingEdited, articleId }: useArtic
   const navigate = useNavigate({ from: "/writer/articles/new" });
 
   const form = useForm({
-    defaultValues: {
-      title: articleBeingEdited?.title ?? "",
-      content: articleBeingEdited?.content ?? "",
-      tags: articleBeingEdited?.tags ?? ([] as string[]),
-      visibility: (articleBeingEdited?.visibility ?? "public") as ArticleVisibility,
-    },
     validators: {
       onChange: articleEditorSchema,
     },
@@ -54,6 +51,7 @@ export function useArticleEditorForm({ articleBeingEdited, articleId }: useArtic
       if (articleActionType === "saveToDrafts") {
         const { articleId } = await createArticle.mutateAsync({ content, title, tags, visibility, slug });
         navigate({ to: "/writer/articles/$articleId/edit", params: { articleId } });
+        form.reset({ content, tags, title, visibility });
       }
 
       if (articleActionType === "submitArticleToRevision") {
@@ -62,11 +60,30 @@ export function useArticleEditorForm({ articleBeingEdited, articleId }: useArtic
 
       if (articleActionType === "saveExistingArticle") {
         await editArticle.mutateAsync({ articleId: articleId ?? "", content, title, tags, visibility });
+        form.reset({ content, tags, title, visibility });
       }
+
+      queryClient.invalidateQueries({ queryKey: ["account-articles"] });
 
       return;
     },
   });
+
+  const isFieldsDirty = useStore(form.store, (state) => state.isDirty);
+  // Sync fetched article into form when data loads asynchronously.
+  // Uses reset() instead of setFieldValue() so defaultValues are updated — isDirty stays false until user edits.
+  // Dep array uses only articleId: re-running on every refetch causes a flash of stale content mid-save.
+
+  useEffect(() => {
+    if (articleBeingEdited) {
+      form.reset({
+        title: articleBeingEdited.title,
+        content: articleBeingEdited.content,
+        tags: articleBeingEdited.tags,
+        visibility: articleBeingEdited.visibility,
+      });
+    }
+  }, [articleBeingEdited?.articleId, articleBeingEdited, form]);
 
   const handleSubmit = async ({ articleActionType }: { articleActionType: ArticleActionType }) => {
     await form.handleSubmit({ articleActionType });
@@ -77,8 +94,10 @@ export function useArticleEditorForm({ articleBeingEdited, articleId }: useArtic
     previewOpen,
     setPreviewOpen,
     handleSubmit,
+    currentArticleStatus: articleBeingEdited?.status,
     isSavingArticleToDraft: createArticle.isPending,
     isSubmittingArticle: submitForReview.isPending,
     isSavingExistingArticle: editArticle.isPending,
+    isSavingExistingButtonDisabled: !isFieldsDirty || editArticle.isPending,
   };
 }

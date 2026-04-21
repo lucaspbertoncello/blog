@@ -25,12 +25,9 @@ export function MetadataRow({
 }: MetadataRowProps) {
   return (
     <div className="flex items-center gap-4 border-b border-border py-3">
-      <TagInput tags={tags} onAdd={onAddTag} onRemove={onRemoveTag} />
+      <TagInput tags={tags ?? []} onAdd={onAddTag} onRemove={onRemoveTag} />
       <span className="text-border">|</span>
-      <Select
-        value={visibility}
-        onValueChange={(v) => onVisibilityChange(v as ArticleVisibility)}
-      >
+      <Select value={visibility} onValueChange={(v) => onVisibilityChange(v as ArticleVisibility)}>
         <SelectTrigger className="h-auto w-auto gap-1 rounded-4xl border-0 bg-transparent px-3 py-1 font-inter text-xs text-muted-foreground shadow-none focus:ring-0">
           <SelectValue />
         </SelectTrigger>
