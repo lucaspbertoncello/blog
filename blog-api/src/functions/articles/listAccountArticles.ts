@@ -39,7 +39,7 @@ export const handler = lambdaHttpAdapter<
           ":pk": "ARTICLES",
           ":accountId": targetAccountId,
         },
-        ProjectionExpression: "articleId, title, #status, slug, visibility, tags, createdAt, updatedAt",
+        ProjectionExpression: "articleId, title, #status, slug, visibility, tags, content, createdAt, updatedAt",
         ExpressionAttributeNames: {
           "#status": "status",
         },
@@ -50,7 +50,7 @@ export const handler = lambdaHttpAdapter<
       statusCode: 200,
       body: {
         count: Count ?? 0,
-        articles: (Items ?? []) as Array<Omit<Article, "content">>,
+        articles: (Items ?? []) as Article[],
       },
     };
   },
@@ -61,6 +61,6 @@ export namespace ListAccountArticles {
   export type UrlParams = { accountId: string };
   export type Response = {
     count: number;
-    articles: Array<Omit<Article, "content">>;
+    articles: Article[];
   };
 }
