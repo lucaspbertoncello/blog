@@ -40,6 +40,12 @@ export function useArticleEditorForm({ articleBeingEdited, articleId }: useArtic
   const navigate = useNavigate({ from: "/writer/articles/new" });
 
   const form = useForm({
+    defaultValues: {
+      title: articleBeingEdited?.title ?? "",
+      content: articleBeingEdited?.content ?? "",
+      tags: articleBeingEdited?.tags ?? [],
+      visibility: articleBeingEdited?.visibility ?? "public",
+    },
     validators: {
       onChange: articleEditorSchema,
     },
@@ -64,16 +70,17 @@ export function useArticleEditorForm({ articleBeingEdited, articleId }: useArtic
       }
 
       queryClient.invalidateQueries({ queryKey: ["account-articles"] });
+      queryClient.invalidateQueries({ queryKey: ["article-by-id"] });
 
       return;
     },
   });
 
   const isFieldsDirty = useStore(form.store, (state) => state.isDirty);
+
   // Sync fetched article into form when data loads asynchronously.
   // Uses reset() instead of setFieldValue() so defaultValues are updated — isDirty stays false until user edits.
   // Dep array uses only articleId: re-running on every refetch causes a flash of stale content mid-save.
-
   useEffect(() => {
     if (articleBeingEdited) {
       form.reset({

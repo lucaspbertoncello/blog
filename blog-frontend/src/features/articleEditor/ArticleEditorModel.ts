@@ -1,23 +1,14 @@
-import { useListAccountArticles } from "@/domain/articles/hooks/useListAccountArticles";
-import { useUserStore } from "@/domain/users/stores/useUserStore";
 import { useArticleEditorForm } from "./hooks/useArticleEditorForm";
 import { useEditorContent } from "./hooks/useEditorContent";
+import { useGetArticleById } from "@/domain/articles/hooks/useGetArticleById";
 
 export function useArticleEditorModel(articleId?: string) {
-  const { account } = useUserStore();
-  const accountId = account?.accountId ?? "";
-
-  // Only fetch when editing an existing article
-  const { data, isLoading } = useListAccountArticles({
-    accountId,
+  const { data, isLoading } = useGetArticleById({
+    articleId: articleId ?? "",
     enabled: !!articleId,
   });
 
-  const articleBeingEdited = articleId
-    ? (data?.articles.find((a) => a.articleId === articleId) ?? null)
-    : null;
-
-  const articleForm = useArticleEditorForm({ articleBeingEdited, articleId });
+  const articleForm = useArticleEditorForm({ articleBeingEdited: data ?? null, articleId });
   const editor = useEditorContent((v) => articleForm.form.setFieldValue("content", v));
 
   return {

@@ -8,5 +8,5 @@ export async function getArticleById(params: GetArticleByIdService.Params) {
 
 export namespace GetArticleByIdService {
   export type Params = { articleId: string };
-  export type Response = Article[];
+  export type Response = Article;
 }
