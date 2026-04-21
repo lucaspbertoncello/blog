@@ -7,12 +7,13 @@ import { getFieldError } from "@/shared/lib/form";
 import { EditorToolbar } from "./components/EditorToolbar";
 import { MetadataRow } from "./components/MetadataRow";
 import { PreviewModal } from "./components/PreviewModal";
+import { ArticleStatusBadge } from "./components/ArticleStatusBadge";
 import type { useArticleEditorModel } from "./ArticleEditorModel";
 
 export type ArticleEditorViewProps = ReturnType<typeof useArticleEditorModel>;
 
 export function ArticleEditorView(props: ArticleEditorViewProps) {
-  const { articleForm, editor, isEditing } = props;
+  const { articleForm, editor, isEditing, isLoadingArticle } = props;
   const {
     form,
     previewOpen,
@@ -21,11 +22,21 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
     isSavingArticleToDraft,
     isSubmittingArticle,
     isSavingExistingArticle,
+    isSavingExistingButtonDisabled,
+    currentArticleStatus,
   } = articleForm;
   const { textareaRef, handleInsert } = editor;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const handleImageUpload = () => fileInputRef.current?.click();
+
+  if (isLoadingArticle) {
+    return (
+      <div className="relative z-10 mx-auto flex max-w-250 items-center justify-center px-12 py-32">
+        <span className="font-inter text-sm text-muted-foreground">Carregando artigo...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="relative z-10 mx-auto max-w-250 px-12">
@@ -40,8 +51,7 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
           </Link>
 
           <div className="flex items-center gap-2">
-            {/* Show contextual label based on whether we're editing or creating */}
-            <span className="font-inter text-xs text-muted-foreground/40">
+              <span className="font-inter text-xs text-muted-foreground/40">
               {isEditing ? "Editando artigo" : "Novo artigo"}
             </span>
             <form.Subscribe>
@@ -60,6 +70,7 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
                     variant="ghost"
                     isLoading={isSavingExistingArticle}
                     onClick={() => handleSubmit({ articleActionType: "saveExistingArticle" })}
+                    disabled={isSavingExistingButtonDisabled}
                   >
                     Salvar artigo
                   </Button>
@@ -67,6 +78,7 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
                   <Button
                     size="sm"
                     isLoading={isSubmittingArticle}
+                    disabled={currentArticleStatus === "in_review"}
                     onClick={() => handleSubmit({ articleActionType: "submitArticleToRevision" })}
                   >
                     Enviar para revisão
@@ -102,6 +114,11 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
               </div>
             )}
           </form.Field>
+
+          {/* Article status */}
+          {isEditing && currentArticleStatus && (
+            <ArticleStatusBadge status={currentArticleStatus} />
+          )}
 
           {/* Metadata row */}
           <form.Field name="tags">
@@ -159,14 +176,20 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
       {/* Hidden file input for image upload */}
       <input ref={fileInputRef} type="file" accept="image/png,image/jpeg" className="hidden" />
 
-      <form.Subscribe selector={(state) => ({ title: state.values.title, content: state.values.content, tags: state.values.tags })}>
+      <form.Subscribe
+        selector={(state) => ({
+          title: state.values.title,
+          content: state.values.content,
+          tags: state.values.tags,
+        })}
+      >
         {({ title, content, tags }) => (
           <PreviewModal
             open={previewOpen}
             onClose={() => setPreviewOpen(false)}
             title={title}
             content={content}
-            tags={tags}
+            tags={tags ?? []}
           />
         )}
       </form.Subscribe>
