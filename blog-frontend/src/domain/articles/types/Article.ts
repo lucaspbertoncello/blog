@@ -11,5 +11,6 @@ export type Article = {
   status: ArticleStatus;
 };
 
+export type ArticleListItem = Article;
 export type ArticleVisibility = "public" | "students_only";
 export type ArticleStatus = "draft" | "in_review" | "published" | "rejected";
