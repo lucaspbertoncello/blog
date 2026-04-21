@@ -2,8 +2,8 @@ import { createRoute, redirect } from "@tanstack/react-router";
 import { rootRoute } from ".";
 import { PublicLayoutGuard } from "@/shared/guards/PublicLayoutGuard";
 import { ProtectedLayoutGuard } from "@/shared/guards/ProtectedLayoutGuard";
+import { WriterLayoutGuard } from "@/shared/guards/WriterLayoutGuard";
 import { useAuthStore } from "@/domain/auth/stores/useAuthStore";
-import { useUserStore } from "@/domain/users/stores/useUserStore";
 
 export const publicLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -35,11 +35,5 @@ export const authGuardRoute = createRoute({
 export const writerLayoutRoute = createRoute({
   getParentRoute: () => protectedLayoutRoute,
   id: "writer",
-  beforeLoad: () => {
-    const hasRequiredRoles =
-      useUserStore.getState().hasWriterAccess() || useUserStore.getState().hasAdminAccess();
-    if (!hasRequiredRoles) {
-      throw redirect({ to: "/" });
-    }
-  },
+  component: WriterLayoutGuard,
 });
