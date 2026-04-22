@@ -3,6 +3,7 @@ import { rootRoute } from ".";
 import { PublicLayoutGuard } from "@/shared/guards/PublicLayoutGuard";
 import { ProtectedLayoutGuard } from "@/shared/guards/ProtectedLayoutGuard";
 import { WriterLayoutGuard } from "@/shared/guards/WriterLayoutGuard";
+import { AdminLayoutGuard } from "@/shared/guards/AdminLayoutGuard";
 import { useAuthStore } from "@/domain/auth/stores/useAuthStore";
 
 export const publicLayoutRoute = createRoute({
@@ -36,4 +37,10 @@ export const writerLayoutRoute = createRoute({
   getParentRoute: () => protectedLayoutRoute,
   id: "writer",
   component: WriterLayoutGuard,
+});
+
+export const adminLayoutRoute = createRoute({
+  getParentRoute: () => protectedLayoutRoute,
+  id: "admin",
+  component: AdminLayoutGuard,
 });
