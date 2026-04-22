@@ -1,10 +1,5 @@
 import { useMemo } from "react";
-import {
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
-  type ColumnDef,
-} from "@tanstack/react-table";
+import { useReactTable, getCoreRowModel, flexRender, type ColumnDef } from "@tanstack/react-table";
 import {
   Table,
   TableBody,
@@ -13,87 +8,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/common/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/shared/components/common/dropdown-menu";
 import { Button } from "@/shared/components/common/button";
 import { Input } from "@/shared/components/common/input";
 import { AnimateIn } from "@/shared/components/custom/AnimateIn";
-import { RiAddLine, RiArrowLeftLine, RiMoreLine } from "@remixicon/react";
+import { Spinner } from "@/shared/components/common/spinner";
+import { RiAddLine, RiArrowLeftLine } from "@remixicon/react";
 import { formatDate } from "@/shared/lib/utils";
 import { Link } from "@tanstack/react-router";
 import type { useArticlesPanelModel } from "./ArticlesPanelModel";
 import type { ArticleListItem, StatusFilter } from "./ArticlesPanelModel";
-import type { ArticleStatus } from "@/domain/articles/types/Article";
+import { STATUS_LABELS, STATUS_FILTERS } from "./constants/index";
+import { StatusBadge } from "./components/StatusBadge";
+import { RowActions } from "./components/RowActions";
 
 export type ArticlesPanelViewProps = ReturnType<typeof useArticlesPanelModel>;
 
-const STATUS_LABELS: Record<ArticleStatus | "all", string> = {
-  all: "Todos",
-  draft: "Rascunho",
-  in_review: "Em revisão",
-  published: "Publicado",
-  rejected: "Rejeitado",
-};
-
-const STATUS_FILTERS: Array<ArticleStatus | "all"> = [
-  "all",
-  "draft",
-  "in_review",
-  "published",
-  "rejected",
-];
-
-function StatusBadge({ status }: { status: ArticleStatus }) {
-  const variants: Record<ArticleStatus, string> = {
-    draft: "bg-muted/50 text-muted-foreground border-border",
-    in_review: "bg-sky-500/10 text-sky-400 border-sky-500/20",
-    published: "bg-primary/10 text-primary border-primary/20",
-    rejected: "bg-red-500/10 text-red-400 border-red-500/20",
-  };
-  return (
-    <span
-      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 font-inter text-xs font-medium ${variants[status]}`}
-    >
-      {STATUS_LABELS[status]}
-    </span>
-  );
-}
-
-type RowActionsProps = {
-  article: ArticleListItem;
-};
-
-function RowActions({ article }: RowActionsProps) {
-  const canSubmit = article.status === "draft" || article.status === "rejected";
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="size-8">
-          <RiMoreLine className="size-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem asChild>
-          <Link to="/writer/articles/$articleId/edit" params={{ articleId: article.articleId }}>
-            Editar
-          </Link>
-        </DropdownMenuItem>
-        {canSubmit && (
-          <DropdownMenuItem>
-            Enviar para revisão
-          </DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
 export function ArticlesPanelView(props: ArticlesPanelViewProps) {
-  const { articles, search, setSearch, statusFilter, setStatusFilter } = props;
+  const {
+    articles,
+    search,
+    setSearch,
+    statusFilter,
+    setStatusFilter,
+    isLoading,
+    onSubmitForReview,
+    canSubmitArticleForReview,
+    submittingId,
+  } = props;
 
   const columns = useMemo<ColumnDef<ArticleListItem>[]>(
     () => [
@@ -101,17 +42,28 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
         accessorKey: "title",
         header: "Título",
         cell: ({ row }) => (
-          <span className="font-inter text-sm font-medium text-foreground/80">
-            {row.getValue("title")}
-          </span>
+          <div
+            className="max-w-80 overflow-hidden"
+            style={{
+              WebkitMaskImage: "linear-gradient(to right, black 65%, transparent 100%)",
+              maskImage: "linear-gradient(to right, black 65%, transparent 100%)",
+            }}
+          >
+            <span className="block font-inter text-sm font-medium whitespace-nowrap text-foreground/80">
+              {row.getValue("title")}
+            </span>
+          </div>
         ),
       },
       {
         accessorKey: "status",
         header: "Status",
-        cell: ({ row }) => (
-          <StatusBadge status={row.getValue("status")} />
-        ),
+        cell: ({ row }) =>
+          submittingId === row.original.articleId ? (
+            <Spinner className="text-muted-foreground" />
+          ) : (
+            <StatusBadge status={row.getValue("status")} />
+          ),
       },
       {
         accessorKey: "visibility",
@@ -133,10 +85,16 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
       },
       {
         id: "actions",
-        cell: ({ row }) => <RowActions article={row.original} />,
+        cell: ({ row }) => (
+          <RowActions
+            article={row.original}
+            canSubmit={canSubmitArticleForReview(row.original)}
+            onSubmitForReview={onSubmitForReview}
+          />
+        ),
       },
     ],
-    []
+    [canSubmitArticleForReview, onSubmitForReview, submittingId]
   );
 
   const table = useReactTable({
@@ -171,9 +129,7 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
 
       <AnimateIn delay={80}>
         <div className="mt-8 mb-4 flex flex-col gap-4">
-          <h1 className="font-sans text-xl font-bold tracking-tight">
-            Painel de artigos
-          </h1>
+          <h1 className="font-sans text-xl font-bold tracking-tight">Painel de artigos</h1>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Input
@@ -208,10 +164,7 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
               {table.getHeaderGroups().map((hg) => (
                 <TableRow key={hg.id} className="border-border hover:bg-transparent">
                   {hg.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      className="font-inter text-xs text-muted-foreground"
-                    >
+                    <TableHead key={header.id} className="font-inter text-xs text-muted-foreground">
                       {flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   ))}
@@ -219,7 +172,16 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.length === 0 ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="py-12 text-center font-inter text-sm text-muted-foreground"
+                  >
+                    Carregando artigos...
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
@@ -232,7 +194,9 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    className="border-border transition-colors hover:bg-muted/5"
+                    className={`border-border transition-colors hover:bg-muted/5 ${
+                      submittingId === row.original.articleId ? "pointer-events-none opacity-50" : ""
+                    }`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
@@ -248,7 +212,8 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
 
         <div className="mt-3 mb-12">
           <p className="font-inter text-xs text-muted-foreground/50">
-            {articles.length} artigo{articles.length !== 1 ? "s" : ""} encontrado{articles.length !== 1 ? "s" : ""}
+            {articles.length} artigo{articles.length !== 1 ? "s" : ""} encontrado
+            {articles.length !== 1 ? "s" : ""}
           </p>
         </div>
       </AnimateIn>
