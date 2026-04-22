@@ -4,6 +4,7 @@ import { z } from "zod";
 import type { Article } from "@/domain/articles/types/Article";
 import { useCreateArticle } from "@/domain/articles/hooks/useCreateArticle";
 import { useSubmitArticleToReview } from "@/domain/articles/hooks/useSubmitArticleToReview";
+import { useDeleteArticle } from "@/domain/articles/hooks/useDeleteArticle";
 import { slugify } from "@/shared/lib/utils";
 import { useNavigate, useBlocker } from "@tanstack/react-router";
 import { useEditArticle } from "@/domain/articles/hooks/useEditArticle";
@@ -37,6 +38,7 @@ export function useArticleEditorForm({ articleBeingEdited, articleId }: useArtic
   const createArticle = useCreateArticle();
   const submitForReview = useSubmitArticleToReview();
   const editArticle = useEditArticle();
+  const deleteArticleMutation = useDeleteArticle();
 
   const navigate = useNavigate({ from: "/writer/articles/new" });
 
@@ -108,15 +110,25 @@ export function useArticleEditorForm({ articleBeingEdited, articleId }: useArtic
     await form.handleSubmit({ articleActionType });
   };
 
+  const handleDelete = async (id: string) => {
+    isSavingRef.current = true;
+    await deleteArticleMutation.mutateAsync({ articleId: id });
+    queryClient.invalidateQueries({ queryKey: ["account-articles"] });
+    queryClient.invalidateQueries({ queryKey: ["article-by-id"] });
+    navigate({ to: "/writer/articles" });
+  };
+
   return {
     form,
     previewOpen,
     setPreviewOpen,
     handleSubmit,
+    handleDelete,
     currentArticleStatus: articleBeingEdited?.status,
     isSavingArticleToDraft: createArticle.isPending,
     isSubmittingArticle: submitForReview.isPending,
     isSavingExistingArticle: editArticle.isPending,
+    isDeletingArticle: deleteArticleMutation.isPending,
     isSavingExistingButtonDisabled: !isFieldsDirty || editArticle.isPending,
   };
 }

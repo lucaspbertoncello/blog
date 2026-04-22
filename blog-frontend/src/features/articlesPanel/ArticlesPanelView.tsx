@@ -34,6 +34,8 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
     onSubmitForReview,
     canSubmitArticleForReview,
     submittingId,
+    onDeleteArticle,
+    deletingId,
   } = props;
 
   const columns = useMemo<ColumnDef<ArticleListItem>[]>(
@@ -90,11 +92,13 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
             article={row.original}
             canSubmit={canSubmitArticleForReview(row.original)}
             onSubmitForReview={onSubmitForReview}
+            onDeleteArticle={onDeleteArticle}
+            isDeleting={deletingId === row.original.articleId}
           />
         ),
       },
     ],
-    [canSubmitArticleForReview, onSubmitForReview, submittingId]
+    [canSubmitArticleForReview, onSubmitForReview, submittingId, onDeleteArticle, deletingId]
   );
 
   const table = useReactTable({
@@ -195,7 +199,9 @@ export function ArticlesPanelView(props: ArticlesPanelViewProps) {
                   <TableRow
                     key={row.id}
                     className={`border-border transition-colors hover:bg-muted/5 ${
-                      submittingId === row.original.articleId ? "pointer-events-none opacity-50" : ""
+                      submittingId === row.original.articleId || deletingId === row.original.articleId
+                        ? "pointer-events-none opacity-50"
+                        : ""
                     }`}
                   >
                     {row.getVisibleCells().map((cell) => (

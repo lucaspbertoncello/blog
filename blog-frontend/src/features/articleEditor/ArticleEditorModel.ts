@@ -14,6 +14,7 @@ export function useArticleEditorModel(articleId?: string) {
   return {
     articleForm,
     editor,
+    articleId,
     isEditing: !!articleId,
     isLoadingArticle: isLoading && !!articleId,
   };

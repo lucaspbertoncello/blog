@@ -27,5 +27,7 @@ export function useArticlesPanelModel() {
     onSubmitForReview: reviewActions.onSubmitForReview,
     canSubmitArticleForReview: reviewActions.canSubmitArticleForReview,
     submittingId: reviewActions.submittingId,
+    onDeleteArticle: reviewActions.onDeleteArticle,
+    deletingId: reviewActions.deletingId,
   };
 }

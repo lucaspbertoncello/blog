@@ -1,27 +1,30 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/shared/components/common/button";
 import { AnimateIn } from "@/shared/components/custom/AnimateIn";
-import { RiArrowLeftLine } from "@remixicon/react";
+import { RiArrowLeftLine, RiDeleteBin2Line } from "@remixicon/react";
 import { getFieldError } from "@/shared/lib/form";
 import { EditorToolbar } from "./components/EditorToolbar";
 import { MetadataRow } from "./components/MetadataRow";
 import { PreviewModal } from "./components/PreviewModal";
 import { ArticleStatusBadge } from "./components/ArticleStatusBadge";
+import { DeleteArticleDialog } from "@/shared/components/custom/DeleteArticleDialog";
 import type { useArticleEditorModel } from "./ArticleEditorModel";
 
 export type ArticleEditorViewProps = ReturnType<typeof useArticleEditorModel>;
 
 export function ArticleEditorView(props: ArticleEditorViewProps) {
-  const { articleForm, editor, isEditing, isLoadingArticle } = props;
+  const { articleForm, editor, articleId, isEditing, isLoadingArticle } = props;
   const {
     form,
     previewOpen,
     setPreviewOpen,
     handleSubmit,
+    handleDelete,
     isSavingArticleToDraft,
     isSubmittingArticle,
     isSavingExistingArticle,
+    isDeletingArticle,
     isSavingExistingButtonDisabled,
     currentArticleStatus,
   } = articleForm;
@@ -29,6 +32,7 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const handleImageUpload = () => fileInputRef.current?.click();
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   if (isLoadingArticle) {
     return (
@@ -65,6 +69,16 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
                 </Button>
               ) : (
                 <>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    isLoading={isDeletingArticle}
+                    className="size-8 text-destructive hover:text-destructive"
+                    onClick={() => setDeleteConfirmOpen(true)}
+                  >
+                    <RiDeleteBin2Line className="size-4" />
+                  </Button>
+
                   <Button
                     size="sm"
                     variant="ghost"
@@ -175,6 +189,13 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
 
       {/* Hidden file input for image upload */}
       <input ref={fileInputRef} type="file" accept="image/png,image/jpeg" className="hidden" />
+
+      <DeleteArticleDialog
+        open={deleteConfirmOpen}
+        isDeleting={isDeletingArticle}
+        onConfirm={() => handleDelete(articleId!)}
+        onCancel={() => setDeleteConfirmOpen(false)}
+      />
 
       <form.Subscribe
         selector={(state) => ({
