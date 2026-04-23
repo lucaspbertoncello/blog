@@ -15,7 +15,7 @@ export function HeaderActions(props: HeaderActionsProps) {
   return (
     <>
       {hasAdminAccess() && (
-        <Link from="/" to="/auth/signin">
+        <Link from="/" to="/admin">
           <Button variant="ghost">Acessar painel administrativo</Button>
         </Link>
       )}
