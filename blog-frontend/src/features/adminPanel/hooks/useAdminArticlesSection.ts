@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useListArticlesByStatus } from "@/domain/articles/hooks/useListArticlesByStatus";
 import { useAdminArticleActions } from "./useAdminArticleActions";
 import { useAdminArticleFilters } from "./useAdminArticleFilters";
@@ -12,23 +13,33 @@ type UseAdminArticlesSectionProps = {
 };
 
 export function useAdminArticlesSection({ enabled }: UseAdminArticlesSectionProps) {
-  const filters = useAdminArticleFilters();
+  const {
+    filterArticles,
+    search,
+    setSearch,
+    statusFilter,
+    setStatusFilter,
+  } = useAdminArticleFilters();
   const { data, isLoading, isError, refetch } = useListArticlesByStatus({
-    status: filters.statusFilter,
+    status: statusFilter,
     enabled,
   });
   const articleActions = useAdminArticleActions();
+  const articles = useMemo(
+    () => filterArticles(data?.articles ?? []),
+    [data?.articles, filterArticles]
+  );
 
   return {
-    articles: filters.filterArticles(data?.articles ?? []),
+    articles,
     totalCount: data?.count ?? 0,
     isLoading,
     isError,
     refetch,
-    search: filters.search,
-    setSearch: filters.setSearch,
-    statusFilter: filters.statusFilter,
-    setStatusFilter: filters.setStatusFilter,
+    search,
+    setSearch,
+    statusFilter,
+    setStatusFilter,
     publishConfirmId: articleActions.publishConfirmId,
     setPublishConfirmId: articleActions.setPublishConfirmId,
     rejectConfirmId: articleActions.rejectConfirmId,
