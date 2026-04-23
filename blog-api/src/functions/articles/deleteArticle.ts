@@ -42,15 +42,18 @@ export const handler = lambdaHttpAdapter<"private", undefined, void, DeleteArtic
     ];
 
     for (let i = 0; i < items.length; i += 25) {
-      await dynamoClient.send(
-        new BatchWriteCommand({
-          RequestItems: {
-            [process.env.TABLE_NAME!]: items.slice(i, i + 25).map((item) => ({
-              DeleteRequest: { Key: { PK: item.PK, SK: item.SK } },
-            })),
-          },
-        }),
-      );
+      let unprocessed = items.slice(i, i + 25).map((item) => ({
+        DeleteRequest: { Key: { PK: item.PK, SK: item.SK } },
+      }));
+
+      while (unprocessed.length > 0) {
+        const { UnprocessedItems } = await dynamoClient.send(
+          new BatchWriteCommand({
+            RequestItems: { [process.env.TABLE_NAME!]: unprocessed },
+          }),
+        );
+        unprocessed = (UnprocessedItems?.[process.env.TABLE_NAME!] ?? []) as typeof unprocessed;
+      }
     }
 
     return { statusCode: 200 };
