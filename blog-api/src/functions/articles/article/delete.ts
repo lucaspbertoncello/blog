@@ -1,29 +1,24 @@
-import { BatchWriteCommand, GetCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { lambdaHttpAdapter } from "../../adapters/lambdaHttpAdapter";
-import { dynamoClient } from "../../clients/dynamoClient";
-import { ApplicationError } from "../../errors/ApplicationError";
-import { dynamoErrorMapper } from "../../errors/mappers/dynamoErrorMapper";
+import { BatchWriteCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { lambdaHttpAdapter } from "../../../adapters/lambdaHttpAdapter";
+import { dynamoClient } from "../../../clients/dynamoClient";
+import { ApplicationError } from "../../../errors/ApplicationError";
+import { dynamoErrorMapper } from "../../../errors/mappers/dynamoErrorMapper";
+import { assertWriterOwnsArticle } from "../_shared/assertWriterOwnsArticle";
+import { getArticleOrThrow } from "../_shared/getArticleOrThrow";
 
 export const handler = lambdaHttpAdapter<"private", undefined, void, DeleteArticle.UrlParams>(
   async ({ params, accountId, role }) => {
     const { articleId } = params;
+    const article = await getArticleOrThrow(articleId);
 
-    const { Item } = await dynamoClient.send(
-      new GetCommand({
-        TableName: process.env.TABLE_NAME,
-        Key: { PK: `ARTICLE#${articleId}`, SK: "INFO" },
-      }),
-    );
+    assertWriterOwnsArticle({
+      article,
+      accountId,
+      role,
+      message: "Sem permissão para excluir este artigo",
+    });
 
-    if (!Item) {
-      throw new ApplicationError("Artigo não encontrado");
-    }
-
-    if (role === "writer" && Item.accountId !== accountId) {
-      throw new ApplicationError("Sem permissão para excluir este artigo");
-    }
-
-    if (role === "writer" && Item.status !== "draft" && Item.status !== "rejected") {
+    if (role === "writer" && article.status !== "draft" && article.status !== "rejected") {
       throw new ApplicationError("Artigo só pode ser excluído quando está em rascunho ou rejeitado");
     }
 
@@ -36,10 +31,7 @@ export const handler = lambdaHttpAdapter<"private", undefined, void, DeleteArtic
       }),
     );
 
-    const items = [
-      ...(allItems ?? []),
-      { PK: `SLUG#${Item.slug}`, SK: "INFO" },
-    ];
+    const items = [...(allItems ?? []), { PK: `SLUG#${article.slug}`, SK: "INFO" }];
 
     for (let i = 0; i < items.length; i += 25) {
       let unprocessed = items.slice(i, i + 25).map((item) => ({
@@ -52,6 +44,7 @@ export const handler = lambdaHttpAdapter<"private", undefined, void, DeleteArtic
             RequestItems: { [process.env.TABLE_NAME!]: unprocessed },
           }),
         );
+
         unprocessed = (UnprocessedItems?.[process.env.TABLE_NAME!] ?? []) as typeof unprocessed;
       }
     }

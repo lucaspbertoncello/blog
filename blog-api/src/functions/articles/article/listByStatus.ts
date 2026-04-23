@@ -1,8 +1,8 @@
 import { QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { lambdaHttpAdapter } from "../../adapters/lambdaHttpAdapter";
-import { Article, ArticleStatus } from "../../types/Article";
-import { dynamoClient } from "../../clients/dynamoClient";
 import z from "zod";
+import { lambdaHttpAdapter } from "../../../adapters/lambdaHttpAdapter";
+import { dynamoClient } from "../../../clients/dynamoClient";
+import { Article } from "../../../types/Article";
 
 const querySchema = z.object({
   status: z.enum(["draft", "in_review", "published", "rejected", "all"]).optional(),
@@ -40,7 +40,6 @@ export const handler = lambdaHttpAdapter<
       body: { count: Count ?? 0, articles: (Items as Array<Omit<Article, "content">>) ?? [] },
     };
   },
-
   {
     requiredRoles: ["admin"],
     querySchema,

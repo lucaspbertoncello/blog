@@ -1,5 +1,5 @@
 createArticle:
-  handler: src/functions/articles/createArticle.handler
+  handler: src/functions/articles/article/create.handler
   events:
     - httpApi:
         method: POST
@@ -8,7 +8,7 @@ createArticle:
           name: jwtAuthorizer
 
 editArticle:
-  handler: src/functions/articles/editArticle.handler
+  handler: src/functions/articles/article/update.handler
   events:
     - httpApi:
         method: PATCH
@@ -17,7 +17,7 @@ editArticle:
           name: jwtAuthorizer
 
 deleteArticle:
-  handler: src/functions/articles/deleteArticle.handler
+  handler: src/functions/articles/article/delete.handler
   events:
     - httpApi:
         method: DELETE
@@ -26,7 +26,7 @@ deleteArticle:
           name: jwtAuthorizer
 
 submitArticle:
-  handler: src/functions/articles/submitArticle.handler
+  handler: src/functions/articles/workflow/submit.handler
   events:
     - httpApi:
         method: PATCH
@@ -35,7 +35,7 @@ submitArticle:
           name: jwtAuthorizer
 
 publishArticle:
-  handler: src/functions/articles/publishArticle.handler
+  handler: src/functions/articles/workflow/publish.handler
   events:
     - httpApi:
         method: PATCH
@@ -44,7 +44,7 @@ publishArticle:
           name: jwtAuthorizer
 
 rejectArticle:
-  handler: src/functions/articles/rejectArticle.handler
+  handler: src/functions/articles/workflow/reject.handler
   events:
     - httpApi:
         method: PATCH
@@ -53,14 +53,14 @@ rejectArticle:
           name: jwtAuthorizer
 
 listPublishedArticles:
-  handler: src/functions/articles/listPublishedArticles.handler
+  handler: src/functions/articles/article/listPublished.handler
   events:
     - httpApi:
         method: GET
         path: /articles/feed
 
 listAccountArticles:
-  handler: src/functions/articles/listAccountArticles.handler
+  handler: src/functions/articles/article/listByAccount.handler
   events:
     - httpApi:
         method: GET
@@ -69,7 +69,7 @@ listAccountArticles:
           name: jwtAuthorizer
 
 listArticlesByStatus:
-  handler: src/functions/articles/listArticlesByStatus.handler
+  handler: src/functions/articles/article/listByStatus.handler
   events:
     - httpApi:
         method: GET
@@ -78,14 +78,14 @@ listArticlesByStatus:
           name: jwtAuthorizer
 
 getPublicArticleBySlug:
-  handler: src/functions/articles/getPublicArticleBySlug.handler
+  handler: src/functions/articles/article/getPublicBySlug.handler
   events:
     - httpApi:
         method: GET
         path: /articles/public/{slug}
 
 getArticleById:
-  handler: src/functions/articles/getArticleById.handler
+  handler: src/functions/articles/article/getById.handler
   events:
     - httpApi:
         method: GET
@@ -94,7 +94,7 @@ getArticleById:
           name: jwtAuthorizer
 
 getArticleBySlug:
-  handler: src/functions/articles/getArticleBySlug.handler
+  handler: src/functions/articles/article/getBySlug.handler
   events:
     - httpApi:
         method: GET
@@ -103,7 +103,7 @@ getArticleBySlug:
           name: jwtAuthorizer
 
 createComment:
-  handler: src/functions/articles/comments/createComment.handler
+  handler: src/functions/articles/comments/create.handler
   events:
     - httpApi:
         method: POST
@@ -112,7 +112,7 @@ createComment:
           name: jwtAuthorizer
 
 editComment:
-  handler: src/functions/articles/comments/editComment.handler
+  handler: src/functions/articles/comments/update.handler
   events:
     - httpApi:
         method: PATCH
@@ -121,7 +121,7 @@ editComment:
           name: jwtAuthorizer
 
 deleteComment:
-  handler: src/functions/articles/comments/deleteComment.handler
+  handler: src/functions/articles/comments/delete.handler
   events:
     - httpApi:
         method: DELETE
@@ -130,7 +130,7 @@ deleteComment:
           name: jwtAuthorizer
 
 listArticleComments:
-  handler: src/functions/articles/comments/listArticleComments.handler
+  handler: src/functions/articles/comments/listByArticle.handler
   events:
     - httpApi:
         method: GET
@@ -139,7 +139,7 @@ listArticleComments:
           name: jwtAuthorizer
 
 listAccountComments:
-  handler: src/functions/articles/comments/listAccountComments.handler
+  handler: src/functions/articles/comments/listByAccount.handler
   events:
     - httpApi:
         method: GET
@@ -148,7 +148,7 @@ listAccountComments:
           name: jwtAuthorizer
 
 likeArticle:
-  handler: src/functions/articles/likes/likeArticle.handler
+  handler: src/functions/articles/likes/create.handler
   events:
     - httpApi:
         method: POST
@@ -157,7 +157,7 @@ likeArticle:
           name: jwtAuthorizer
 
 listArticleLikes:
-  handler: src/functions/articles/likes/listArticleLikes.handler
+  handler: src/functions/articles/likes/listByArticle.handler
   events:
     - httpApi:
         method: GET
@@ -166,7 +166,7 @@ listArticleLikes:
           name: jwtAuthorizer
 
 unlikeArticle:
-  handler: src/functions/articles/likes/unlikeArticle.handler
+  handler: src/functions/articles/likes/delete.handler
   events:
     - httpApi:
         method: DELETE

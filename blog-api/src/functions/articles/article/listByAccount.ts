@@ -1,9 +1,9 @@
 import { GetCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { lambdaHttpAdapter } from "../../adapters/lambdaHttpAdapter";
-import { dynamoClient } from "../../clients/dynamoClient";
-import { ApplicationError } from "../../errors/ApplicationError";
-import { dynamoErrorMapper } from "../../errors/mappers/dynamoErrorMapper";
-import { Article } from "../../types/Article";
+import { lambdaHttpAdapter } from "../../../adapters/lambdaHttpAdapter";
+import { dynamoClient } from "../../../clients/dynamoClient";
+import { ApplicationError } from "../../../errors/ApplicationError";
+import { dynamoErrorMapper } from "../../../errors/mappers/dynamoErrorMapper";
+import { Article } from "../../../types/Article";
 
 export const handler = lambdaHttpAdapter<
   "private",
@@ -38,7 +38,8 @@ export const handler = lambdaHttpAdapter<
           ":pk": `ACCOUNT#${targetAccountId}`,
           ":prefix": "ARTICLE#",
         },
-        ProjectionExpression: "articleId, title, #status, slug, visibility, tags, content, createdAt, updatedAt",
+        ProjectionExpression:
+          "articleId, title, #status, slug, visibility, tags, content, createdAt, updatedAt",
         ExpressionAttributeNames: {
           "#status": "status",
         },

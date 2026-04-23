@@ -1,25 +1,16 @@
-import { GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { lambdaHttpAdapter } from "../../adapters/lambdaHttpAdapter";
-import { dynamoClient } from "../../clients/dynamoClient";
-import { ApplicationError } from "../../errors/ApplicationError";
-import { dynamoErrorMapper } from "../../errors/mappers/dynamoErrorMapper";
+import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { lambdaHttpAdapter } from "../../../adapters/lambdaHttpAdapter";
+import { dynamoClient } from "../../../clients/dynamoClient";
+import { ApplicationError } from "../../../errors/ApplicationError";
+import { dynamoErrorMapper } from "../../../errors/mappers/dynamoErrorMapper";
+import { getArticleOrThrow } from "../_shared/getArticleOrThrow";
 
 export const handler = lambdaHttpAdapter<"private", undefined, void, RejectArticle.UrlParams>(
   async ({ params }) => {
     const articleId = params.articleId;
+    const article = await getArticleOrThrow(articleId);
 
-    const getCommand = new GetCommand({
-      TableName: process.env.TABLE_NAME,
-      Key: { PK: `ARTICLE#${articleId}`, SK: "INFO" },
-    });
-
-    const { Item } = await dynamoClient.send(getCommand);
-
-    if (!Item) {
-      throw new ApplicationError("Artigo não encontrado");
-    }
-
-    if (Item.status !== "in_review") {
+    if (article.status !== "in_review") {
       throw new ApplicationError("Apenas artigos em revisão podem ser rejeitados");
     }
 
@@ -33,7 +24,7 @@ export const handler = lambdaHttpAdapter<"private", undefined, void, RejectArtic
       ExpressionAttributeNames: { "#status": "status" },
       ExpressionAttributeValues: {
         ":status": "rejected",
-        ":gsi2sk": `STATUS#rejected#CREATED_AT#${Item.createdAt}`,
+        ":gsi2sk": `STATUS#rejected#CREATED_AT#${article.createdAt}`,
         ":updatedAt": now,
         ":in_review": "in_review",
       },

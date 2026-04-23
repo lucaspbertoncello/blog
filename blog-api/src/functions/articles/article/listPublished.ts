@@ -1,8 +1,8 @@
 import { QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { lambdaHttpAdapter } from "../../adapters/lambdaHttpAdapter";
-import { dynamoClient } from "../../clients/dynamoClient";
-import { dynamoErrorMapper } from "../../errors/mappers/dynamoErrorMapper";
-import { Article } from "../../types/Article";
+import { lambdaHttpAdapter } from "../../../adapters/lambdaHttpAdapter";
+import { dynamoClient } from "../../../clients/dynamoClient";
+import { dynamoErrorMapper } from "../../../errors/mappers/dynamoErrorMapper";
+import { Article } from "../../../types/Article";
 
 export const handler = lambdaHttpAdapter<"public", undefined, ListPublishedArticles.Response>(
   async () => {

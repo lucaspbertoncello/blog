@@ -1,9 +1,11 @@
-import { GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
 import { lambdaHttpAdapter } from "../../../adapters/lambdaHttpAdapter";
 import { dynamoClient } from "../../../clients/dynamoClient";
 import { ApplicationError } from "../../../errors/ApplicationError";
 import { dynamoErrorMapper } from "../../../errors/mappers/dynamoErrorMapper";
+import { getArticleOrThrow } from "../_shared/getArticleOrThrow";
+import { getCommentOrThrow } from "../_shared/getCommentOrThrow";
 
 const schema = z.object({
   content: z.string().min(1, "Conteúdo não pode ser vazio"),
@@ -18,28 +20,10 @@ export const handler = lambdaHttpAdapter<
   async ({ body, params, accountId }) => {
     const { articleId, commentId } = params;
 
-    const [{ Item: article }, { Item: comment }] = await Promise.all([
-      dynamoClient.send(
-        new GetCommand({
-          TableName: process.env.TABLE_NAME,
-          Key: { PK: `ARTICLE#${articleId}`, SK: "INFO" },
-        }),
-      ),
-      dynamoClient.send(
-        new GetCommand({
-          TableName: process.env.TABLE_NAME,
-          Key: { PK: `ARTICLE#${articleId}`, SK: `COMMENT#${commentId}` },
-        }),
-      ),
+    const [, comment] = await Promise.all([
+      getArticleOrThrow(articleId),
+      getCommentOrThrow(articleId, commentId),
     ]);
-
-    if (!article) {
-      throw new ApplicationError("Artigo não encontrado");
-    }
-
-    if (!comment) {
-      throw new ApplicationError("Comentário não encontrado");
-    }
 
     if (comment.accountId !== accountId) {
       throw new ApplicationError("Você não tem permissão para editar este comentário");

@@ -1,10 +1,10 @@
-import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { lambdaHttpAdapter } from "../../../adapters/lambdaHttpAdapter";
 import { dynamoClient } from "../../../clients/dynamoClient";
-import { ApplicationError } from "../../../errors/ApplicationError";
 import { dynamoErrorMapper } from "../../../errors/mappers/dynamoErrorMapper";
-import { randomUUID } from "node:crypto";
+import { getArticleOrThrow } from "../_shared/getArticleOrThrow";
 
 const schema = z.object({
   content: z.string().min(1, "Conteúdo é obrigatório"),
@@ -17,19 +17,7 @@ export const handler = lambdaHttpAdapter<
   CreateComment.UrlParams
 >(
   async ({ body, params, accountId }) => {
-    const { Item: article } = await dynamoClient.send(
-      new GetCommand({
-        TableName: process.env.TABLE_NAME,
-        Key: {
-          PK: `ARTICLE#${params.articleId}`,
-          SK: "INFO",
-        },
-      }),
-    );
-
-    if (!article) {
-      throw new ApplicationError("Artigo não encontrado");
-    }
+    await getArticleOrThrow(params.articleId);
 
     const uuid = randomUUID();
     const now = new Date().toISOString();
