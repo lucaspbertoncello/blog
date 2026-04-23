@@ -6,3 +6,11 @@ getMe:
         path: /me
         authorizer:
           name: jwtAuthorizer
+listAllAccounts:
+  handler: src/functions/users/listAllAccounts.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /accounts
+        authorizer:
+          name: jwtAuthorizer
