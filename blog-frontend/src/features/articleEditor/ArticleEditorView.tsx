@@ -8,6 +8,7 @@ import { EditorToolbar } from "./components/EditorToolbar";
 import { MetadataRow } from "./components/MetadataRow";
 import { PreviewModal } from "./components/PreviewModal";
 import { ArticleStatusBadge } from "./components/ArticleStatusBadge";
+import { ArticleImageUploadStatus } from "./components/ArticleImageUploadStatus";
 import { DeleteArticleDialog } from "@/shared/components/custom/DeleteArticleDialog";
 import type { useArticleEditorModel } from "./ArticleEditorModel";
 
@@ -29,7 +30,8 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
     currentArticleStatus,
   } = articleForm;
   const { textareaRef, handleInsert } = editor;
-  const { getRootProps, getInputProps, isDragActive, open } = imageUpload;
+  const { getRootProps, getInputProps, isDragActive, open, isUploading, uploadFileName, uploadPhase, uploadProgress } =
+    imageUpload;
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
@@ -156,7 +158,16 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
             onContentChange={handleInsert}
             onPreview={() => setPreviewOpen(true)}
             onImageUpload={open}
+            isImageUploading={isUploading}
           />
+
+          {uploadPhase !== "idle" && (
+            <ArticleImageUploadStatus
+              fileName={uploadFileName}
+              progress={uploadProgress}
+              phase={uploadPhase}
+            />
+          )}
 
           {/* Editor */}
           <form.Field name="content">

@@ -1,4 +1,5 @@
 import { Separator } from "@/shared/components/common/separator";
+import { Spinner } from "@/shared/components/common/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/common/tooltip";
 import {
   RiBold,
@@ -24,6 +25,7 @@ export type EditorToolbarProps = {
   onContentChange: (result: InsertResult) => void;
   onPreview: () => void;
   onImageUpload: () => void;
+  isImageUploading?: boolean;
 };
 
 type ToolbarAction = {
@@ -37,6 +39,7 @@ export function EditorToolbar({
   onContentChange,
   onPreview,
   onImageUpload,
+  isImageUploading = false,
 }: EditorToolbarProps) {
   function run(action: (t: HTMLTextAreaElement) => InsertResult) {
     const ta = textareaRef.current;
@@ -131,8 +134,12 @@ export function EditorToolbar({
 
       <Separator orientation="vertical" className="mx-1.5 h-4" />
 
-      <ToolbarButton label="Inserir imagem" onClick={onImageUpload}>
-        <RiImageLine className="size-4" />
+      <ToolbarButton
+        label={isImageUploading ? "Enviando imagem" : "Inserir imagem"}
+        onClick={onImageUpload}
+        disabled={isImageUploading}
+      >
+        {isImageUploading ? <Spinner className="size-4" /> : <RiImageLine className="size-4" />}
       </ToolbarButton>
 
       <div className="flex-1" />
@@ -152,10 +159,12 @@ export function EditorToolbar({
 function ToolbarButton({
   label,
   onClick,
+  disabled = false,
   children,
 }: {
   label: string;
   onClick: () => void;
+  disabled?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -164,7 +173,8 @@ function ToolbarButton({
         <button
           type="button"
           onClick={onClick}
-          className="flex size-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted/30 hover:text-foreground"
+          disabled={disabled}
+          className="flex size-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted/30 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
         >
           {children}
         </button>

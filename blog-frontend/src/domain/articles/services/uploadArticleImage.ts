@@ -21,7 +21,7 @@ function assertIsValidArticleImage(file: File): asserts file is File & { type: A
 }
 
 export async function uploadArticleImage(params: UploadArticleImageService.Params) {
-  const { file } = params;
+  const { file, onProgress } = params;
 
   assertIsValidArticleImage(file);
 
@@ -35,7 +35,15 @@ export async function uploadArticleImage(params: UploadArticleImageService.Param
     throw new Error("A resposta do upload nao retornou a chave do arquivo");
   }
 
-  await axios.post(presignedPost.url, buildFileUploadFormData(presignedPost.fields, file));
+  await axios.post(presignedPost.url, buildFileUploadFormData(presignedPost.fields, file), {
+    onUploadProgress: (event) => {
+      if (!event.total) {
+        return;
+      }
+
+      onProgress?.(Math.round((event.loaded / event.total) * 100));
+    },
+  });
 
   return {
     key,
@@ -46,6 +54,6 @@ export async function uploadArticleImage(params: UploadArticleImageService.Param
 }
 
 export namespace UploadArticleImageService {
-  export type Params = { file: File };
+  export type Params = { file: File; onProgress?: (progress: number) => void };
   export type Response = ArticleImageUploadResult;
 }
