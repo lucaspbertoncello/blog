@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/shared/components/common/button";
 import { AnimateIn } from "@/shared/components/custom/AnimateIn";
-import { RiArrowLeftLine, RiDeleteBin2Line } from "@remixicon/react";
+import { RiArrowLeftLine, RiDeleteBin2Line, RiUploadCloud2Line } from "@remixicon/react";
 import { getFieldError } from "@/shared/lib/form";
 import { EditorToolbar } from "./components/EditorToolbar";
 import { MetadataRow } from "./components/MetadataRow";
@@ -14,7 +14,7 @@ import type { useArticleEditorModel } from "./ArticleEditorModel";
 export type ArticleEditorViewProps = ReturnType<typeof useArticleEditorModel>;
 
 export function ArticleEditorView(props: ArticleEditorViewProps) {
-  const { articleForm, editor, articleId, isEditing, isLoadingArticle } = props;
+  const { articleForm, editor, articleId, isEditing, isLoadingArticle, imageUpload } = props;
   const {
     form,
     previewOpen,
@@ -29,9 +29,8 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
     currentArticleStatus,
   } = articleForm;
   const { textareaRef, handleInsert } = editor;
+  const { getRootProps, getInputProps, isDragActive, open } = imageUpload;
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const handleImageUpload = () => fileInputRef.current?.click();
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   if (isLoadingArticle) {
@@ -55,7 +54,7 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
           </Link>
 
           <div className="flex items-center gap-2">
-              <span className="font-inter text-xs text-muted-foreground/40">
+            <span className="font-inter text-xs text-muted-foreground/40">
               {isEditing ? "Editando artigo" : "Novo artigo"}
             </span>
             <form.Subscribe>
@@ -130,9 +129,7 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
           </form.Field>
 
           {/* Article status */}
-          {isEditing && currentArticleStatus && (
-            <ArticleStatusBadge status={currentArticleStatus} />
-          )}
+          {isEditing && currentArticleStatus && <ArticleStatusBadge status={currentArticleStatus} />}
 
           {/* Metadata row */}
           <form.Field name="tags">
@@ -158,13 +155,20 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
             textareaRef={textareaRef}
             onContentChange={handleInsert}
             onPreview={() => setPreviewOpen(true)}
-            onImageUpload={handleImageUpload}
+            onImageUpload={open}
           />
 
           {/* Editor */}
           <form.Field name="content">
             {(field) => (
-              <div>
+              <div {...getRootProps()} className="relative">
+                <input {...getInputProps()} />
+                {isDragActive && (
+                  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-sm border-2 border-dashed border-primary/30 bg-background/90 backdrop-blur-sm">
+                    <RiUploadCloud2Line className="size-12 text-primary/40" />
+                    <p className="mt-3 font-mono text-sm text-muted-foreground/70">Solte a imagem aqui</p>
+                  </div>
+                )}
                 <textarea
                   ref={textareaRef}
                   value={field.state.value}
@@ -186,9 +190,6 @@ export function ArticleEditorView(props: ArticleEditorViewProps) {
           </form.Field>
         </div>
       </AnimateIn>
-
-      {/* Hidden file input for image upload */}
-      <input ref={fileInputRef} type="file" accept="image/png,image/jpeg" className="hidden" />
 
       <DeleteArticleDialog
         open={deleteConfirmOpen}

@@ -8,5 +8,10 @@ export function getApiErrorMessage(error: unknown): string {
   if (isAxiosError<ApiErrorBody>(error)) {
     return error.response?.data?.message ?? DEFAULT_MESSAGE;
   }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
   return DEFAULT_MESSAGE;
 }
