@@ -18,7 +18,7 @@ import type { useArticlePageModel } from "./ArticlePageModel";
 export type ArticlePageViewProps = ReturnType<typeof useArticlePageModel>;
 
 export function ArticlePageView(props: ArticlePageViewProps) {
-  const { article, getArticleError, isFetchingArticle, like, refetchArticle } = props;
+  const { article, comments, getArticleError, isFetchingArticle, like, refetchArticle } = props;
 
   return (
     <div className="relative z-10 mx-auto max-w-250 px-12">
@@ -115,9 +115,10 @@ export function ArticlePageView(props: ArticlePageViewProps) {
                 {like.likedByMe ? <RiHeartFill className="size-3.5" /> : <RiHeartLine className="size-3.5" />}
                 {like.likesCount}
               </button>
-              <button className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/30 transition-colors hover:text-primary">
-                <RiChat3Line className="size-3.5" />2
-              </button>
+              <span className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/30">
+                <RiChat3Line className="size-3.5" />
+                {comments.commentsCountLabel}
+              </span>
             </div>
           </AnimateIn>
 
@@ -125,6 +126,68 @@ export function ArticlePageView(props: ArticlePageViewProps) {
             <div className="mt-8">
               <MarkdownRenderer content={article.content} />
             </div>
+          </AnimateIn>
+
+          <AnimateIn delay={420}>
+            <section className="mt-12 border-t border-border pt-8">
+              <div className="flex items-center justify-between gap-4">
+                <h2 className="font-sans text-xl font-bold tracking-tight text-foreground">Comentários</h2>
+                <span className="font-inter text-xs text-muted-foreground/40">
+                  {comments.commentsCountLabel} comentários
+                </span>
+              </div>
+
+              {comments.isCommentsUnavailable ? (
+                <div className="mt-6 border-l border-border pl-4">
+                  <p className="font-inter text-sm text-muted-foreground/60">
+                    Entre na sua conta para ver os comentários deste artigo.
+                  </p>
+                  <Link
+                    to="/auth/signin"
+                    className="mt-3 inline-flex font-inter text-xs text-primary transition-colors hover:text-primary/80"
+                  >
+                    entrar
+                  </Link>
+                </div>
+              ) : comments.isLoadingComments ? (
+                <div className="mt-6 space-y-4">
+                  <div className="space-y-2 border-l border-border pl-4">
+                    <div className="h-3 w-28 animate-pulse rounded-full bg-muted" />
+                    <div className="h-4 w-full animate-pulse rounded-full bg-muted" />
+                    <div className="h-4 w-3/4 animate-pulse rounded-full bg-muted" />
+                  </div>
+                  <div className="space-y-2 border-l border-border pl-4">
+                    <div className="h-3 w-24 animate-pulse rounded-full bg-muted" />
+                    <div className="h-4 w-5/6 animate-pulse rounded-full bg-muted" />
+                  </div>
+                </div>
+              ) : comments.comments.length === 0 ? (
+                <p className="mt-6 font-inter text-sm text-muted-foreground/60">
+                  Nenhum comentário publicado ainda.
+                </p>
+              ) : (
+                <div className="mt-6 space-y-5">
+                  {comments.comments.map((comment) => (
+                    <article key={comment.commentId} className="border-l border-border pl-4">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <span className="font-inter text-xs font-medium text-foreground/70">
+                          usuário {comment.accountId.slice(0, 8)}
+                        </span>
+                        <time
+                          dateTime={comment.createdAt}
+                          className="font-inter text-xs text-muted-foreground/40"
+                        >
+                          {formatDate(comment.createdAt)}
+                        </time>
+                      </div>
+                      <p className="mt-2 font-inter text-sm leading-6 whitespace-pre-wrap text-muted-foreground/80">
+                        {comment.content}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
           </AnimateIn>
 
           <AnimateIn delay={460}>

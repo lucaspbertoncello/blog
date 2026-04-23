@@ -2,6 +2,7 @@ import { useGetArticleBySlug } from "@/domain/articles/hooks/useGetArticleBySlug
 import { useAuthStore } from "@/domain/auth/stores/useAuthStore";
 import { useUserStore } from "@/domain/users/stores/useUserStore";
 import { useParams } from "@tanstack/react-router";
+import { useArticleComments } from "./hooks/useArticleComments";
 import { useArticleLikeActions } from "./hooks/useArticleLikeActions";
 
 export function useArticlePageModel() {
@@ -11,6 +12,7 @@ export function useArticlePageModel() {
 
   const { data, isFetching, error, refetch } = useGetArticleBySlug({ articleSlug, isAuthenticated });
   const like = useArticleLikeActions({ article: data, accountId, isAuthenticated });
+  const comments = useArticleComments({ article: data, isAuthenticated });
 
   return {
     article: data,
@@ -18,5 +20,6 @@ export function useArticlePageModel() {
     getArticleError: error,
     refetchArticle: refetch,
     like,
+    comments,
   };
 }
