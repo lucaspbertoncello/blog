@@ -23,9 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 .claude
-CLAUDE.md
-AGENTS.md
 .superpowers
-docs
 .env
-PLAN.md
+AGENTS.md
+CODE_REVIEW_ISSUES.md
+docs/

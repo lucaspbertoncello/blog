@@ -1,8 +1,9 @@
+node_modules
+
 .vscode
 .env
 .claude
-AGENT.md
-CLAUDE.md
-node_modules
 .serverless
-TODO.md
+
+AGENTS.md
+docs/
