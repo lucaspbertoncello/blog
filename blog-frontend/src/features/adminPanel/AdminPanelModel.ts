@@ -11,9 +11,9 @@ export function useAdminPanelModel({ section }: UseAdminPanelModelProps) {
   const articles = useAdminArticlesSection({ enabled: section === "articles" });
   const users = useAdminUsersSection({ enabled: section === "users" });
 
-  return {
-    section,
-    articles,
-    users,
-  };
+  if (section === "users") {
+    return { section, users };
+  }
+
+  return { section, articles };
 }

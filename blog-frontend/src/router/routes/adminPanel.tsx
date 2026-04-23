@@ -13,11 +13,11 @@ export const adminIndexRoute = createRoute({
 export const adminArticlesRoute = createRoute({
   getParentRoute: () => adminPanelLayoutRoute,
   path: "/admin/articles",
-  component: AdminPanelViewModel,
+  component: () => <AdminPanelViewModel section="articles" />,
 });
 
 export const adminUsersRoute = createRoute({
   getParentRoute: () => adminPanelLayoutRoute,
   path: "/admin/users",
-  component: AdminPanelViewModel,
+  component: () => <AdminPanelViewModel section="users" />,
 });
