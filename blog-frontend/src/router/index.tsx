@@ -1,3 +1,4 @@
+import { NotFoundPage } from "@/shared/components/custom/NotFoundPage";
 import { Toaster } from "@/shared/components/common/sonner";
 import { queryClient } from "@/shared/lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -18,6 +19,7 @@ export const rootRoute = createRootRoute({
       {import.meta.env.DEV && <TanStackRouterDevtools />}
     </QueryClientProvider>
   ),
+  notFoundComponent: NotFoundPage,
 });
 
 const routeTree = rootRoute.addChildren([
