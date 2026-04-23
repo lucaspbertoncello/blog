@@ -8,7 +8,7 @@ import { articlesPanelLayoutRoute, authLayoutRoute, feedLayoutRoute, adminPanelL
 import { signinRoute, signupRoute, verifyCodeRoute } from "./routes/auth";
 import { feedRoute, articlePageRoute } from "./routes/feed";
 import { articlesPanelRoute, articleEditorNewRoute, articleEditorEditRoute } from "./routes/writerPanel";
-import { adminIndexRoute, adminArticlesRoute, adminUsersRoute, adminCommentsRoute } from "./routes/adminPanel";
+import { adminIndexRoute, adminArticlesRoute, adminUsersRoute } from "./routes/adminPanel";
 
 export const rootRoute = createRootRoute({
   component: () => (
@@ -32,7 +32,7 @@ const routeTree = rootRoute.addChildren([
       articlesPanelLayoutRoute.addChildren([articlesPanelRoute, articleEditorNewRoute, articleEditorEditRoute]),
     ]),
     adminLayoutRoute.addChildren([
-      adminPanelLayoutRoute.addChildren([adminIndexRoute, adminArticlesRoute, adminUsersRoute, adminCommentsRoute]),
+      adminPanelLayoutRoute.addChildren([adminIndexRoute, adminArticlesRoute, adminUsersRoute]),
     ]),
   ]),
 ]);

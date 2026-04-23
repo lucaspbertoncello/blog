@@ -34,9 +34,6 @@ export function AdminPanelLayout() {
             <Link to="/admin/users" className={TAB_INACTIVE} activeProps={{ className: TAB_ACTIVE }}>
               Usuários
             </Link>
-            <Link to="/admin/comments" className={TAB_INACTIVE} activeProps={{ className: TAB_ACTIVE }}>
-              Comentários
-            </Link>
           </nav>
         </div>
       </AnimateIn>
