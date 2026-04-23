@@ -12,7 +12,7 @@ export function dynamoErrorMapper(err: unknown): ApplicationError {
       }
 
       case "ConditionalCheckFailedException":
-        return new ApplicationError("Operação não permitida: condição não satisfeita");
+        return new ApplicationError("Conflito de concorrência. Tente novamente");
 
       case "TransactionConflictException":
         return new ApplicationError("Conflito ao processar a operação. Tente novamente");

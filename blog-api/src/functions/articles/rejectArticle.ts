@@ -29,11 +29,13 @@ export const handler = lambdaHttpAdapter<"private", undefined, void, RejectArtic
       TableName: process.env.TABLE_NAME,
       Key: { PK: `ARTICLE#${articleId}`, SK: "INFO" },
       UpdateExpression: "SET #status = :status, GSI2SK = :gsi2sk, updatedAt = :updatedAt",
+      ConditionExpression: "#status = :in_review",
       ExpressionAttributeNames: { "#status": "status" },
       ExpressionAttributeValues: {
         ":status": "rejected",
         ":gsi2sk": `STATUS#rejected#CREATED_AT#${Item.createdAt}`,
         ":updatedAt": now,
+        ":in_review": "in_review",
       },
     });
 
