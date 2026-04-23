@@ -5,7 +5,7 @@ export function useGetArticleById({ articleId, enabled }: { articleId: string; e
   const methods = useQuery({
     queryKey: ["article-by-id", articleId],
     queryFn: () => getArticleById({ articleId }),
-    enabled: enabled || !articleId,
+    enabled: (enabled ?? true) && !!articleId,
   });
 
   return methods;
