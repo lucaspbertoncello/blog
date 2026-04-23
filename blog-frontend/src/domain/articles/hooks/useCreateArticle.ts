@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { createArticle } from "../services/createArticle";
+import { getApiErrorMessage } from "@/shared/lib/apiError";
 import { toast } from "sonner";
 
 export function useCreateArticle() {
@@ -8,8 +9,8 @@ export function useCreateArticle() {
     onSuccess: () => {
       toast.success("Artigo salvo como rascunho");
     },
-    onError: () => {
-      toast.error("Ocorreu um erro ao salvar o seu artigo como rascunho. Tente novamente");
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error));
     },
   });
 

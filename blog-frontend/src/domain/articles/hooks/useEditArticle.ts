@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { editArticle } from "../services/editArticle";
+import { getApiErrorMessage } from "@/shared/lib/apiError";
 import { toast } from "sonner";
 
 export function useEditArticle() {
@@ -8,8 +9,8 @@ export function useEditArticle() {
     onSuccess: () => {
       toast.success("Artigo salvo com sucesso");
     },
-    onError: () => {
-      toast.error("Ocorreu um erro ao salvar o seu artigo. Tente novamente");
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error));
     },
   });
 

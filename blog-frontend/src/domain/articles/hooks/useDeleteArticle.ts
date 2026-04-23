@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { deleteArticle } from "../services/deleteArticle";
+import { getApiErrorMessage } from "@/shared/lib/apiError";
 import { toast } from "sonner";
 
 export function useDeleteArticle() {
@@ -8,8 +9,8 @@ export function useDeleteArticle() {
     onSuccess: () => {
       toast.success("Artigo deletado com sucesso");
     },
-    onError: () => {
-      toast.error("Ocorreu um erro ao deletar seu artigo. Tente novamente");
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error));
     },
   });
 

@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { submitArticleToReviewService } from "../services/submitArticleToReview";
+import { getApiErrorMessage } from "@/shared/lib/apiError";
 import { toast } from "sonner";
 
 export function useSubmitArticleToReview() {
@@ -8,8 +9,8 @@ export function useSubmitArticleToReview() {
     onSuccess: () => {
       toast.success("Artigo enviado para revisão");
     },
-    onError: () => {
-      toast.error("Ocorreu um erro ao enviar seu artigo para revisão. Tente novamente");
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error));
     },
   });
 
