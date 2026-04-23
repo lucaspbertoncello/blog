@@ -1,165 +1,224 @@
-import { useState, useMemo } from "react";
-import { useReactTable, getCoreRowModel, flexRender, type ColumnDef } from "@tanstack/react-table";
+import { useMemo } from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  useReactTable, getCoreRowModel, flexRender, type ColumnDef,
+} from "@tanstack/react-table";
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/shared/components/common/table";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/shared/components/common/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose,
+} from "@/shared/components/common/dialog";
 import { Button } from "@/shared/components/common/button";
 import { Input } from "@/shared/components/common/input";
+import { Skeleton } from "@/shared/components/common/skeleton";
 import { AnimateIn } from "@/shared/components/custom/AnimateIn";
 import { StatusBadge } from "@/features/articlesPanel/components/StatusBadge";
-import { DeleteArticleDialog } from "@/shared/components/custom/DeleteArticleDialog";
-import { RiMoreLine } from "@remixicon/react";
-import { formatDate } from "@/shared/lib/utils";
-import type { ArticleStatus, ArticleVisibility } from "@/domain/articles/types/Article";
 import { STATUS_LABELS, STATUS_FILTERS } from "@/features/articlesPanel/constants";
-import type { StatusFilter } from "@/features/articlesPanel/hooks/useArticleFilters";
+import { RiMoreLine } from "@remixicon/react";
+import type { useAdminArticlesModel } from "./AdminArticlesModel";
+import type { AdminArticleItem, AdminArticleStatusFilter } from "./AdminArticlesModel";
 
-type MockArticle = {
-  articleId: string;
-  title: string;
-  authorEmail: string;
-  status: ArticleStatus;
-  visibility: ArticleVisibility;
-  updatedAt: string;
-};
+export type AdminArticlesViewProps = ReturnType<typeof useAdminArticlesModel>;
 
-const MOCK_ARTICLES: MockArticle[] = [
-  { articleId: "1", title: "Introdução ao TypeScript", authorEmail: "ana@dev.blog", status: "published", visibility: "public", updatedAt: "2024-03-15" },
-  { articleId: "2", title: "React Hooks na prática", authorEmail: "carlos@dev.blog", status: "in_review", visibility: "students_only", updatedAt: "2024-03-20" },
-  { articleId: "3", title: "CSS Grid vs Flexbox", authorEmail: "ana@dev.blog", status: "draft", visibility: "public", updatedAt: "2024-03-22" },
-  { articleId: "4", title: "Deploy com Docker e CI/CD", authorEmail: "lucas@dev.blog", status: "rejected", visibility: "students_only", updatedAt: "2024-03-10" },
-  { articleId: "5", title: "Node.js Event Loop explicado", authorEmail: "carlos@dev.blog", status: "in_review", visibility: "public", updatedAt: "2024-03-25" },
-];
+const COL_COUNT = 5;
 
-function ArticleRowActions({ article }: { article: MockArticle }) {
-  const [confirmOpen, setConfirmOpen] = useState(false);
-
+function ArticleTableSkeleton() {
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="size-8">
-            <RiMoreLine className="size-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem>Editar</DropdownMenuItem>
-          {article.status === "in_review" && (
-            <>
-              <DropdownMenuItem>Publicar</DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive focus:text-destructive">
-                Rejeitar
-              </DropdownMenuItem>
-            </>
-          )}
-          <DropdownMenuItem
-            className="text-destructive focus:text-destructive"
-            onClick={() => setConfirmOpen(true)}
-          >
-            Excluir
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <DeleteArticleDialog
-        open={confirmOpen}
-        isDeleting={false}
-        onConfirm={() => setConfirmOpen(false)}
-        onCancel={() => setConfirmOpen(false)}
-      />
+      {Array.from({ length: 5 }).map((_, i) => (
+        <TableRow key={i} className="border-border hover:bg-transparent">
+          <TableCell><Skeleton className="h-4 w-64" /></TableCell>
+          <TableCell><Skeleton className="h-5 w-24 rounded-full" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+          <TableCell><Skeleton className="h-8 w-8 rounded-full" /></TableCell>
+        </TableRow>
+      ))}
     </>
   );
 }
 
-export function AdminArticlesView() {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-
-  const articles = useMemo(() => {
-    const q = search.toLowerCase();
-    return MOCK_ARTICLES.filter((a) => {
-      const matchesSearch = a.title.toLowerCase().includes(q) || a.authorEmail.toLowerCase().includes(q);
-      const matchesStatus = statusFilter === "all" || a.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
-  }, [search, statusFilter]);
-
-  const columns = useMemo<ColumnDef<MockArticle>[]>(
-    () => [
-      {
-        accessorKey: "title",
-        header: "Título",
-        cell: ({ row }) => (
-          <div
-            className="max-w-72 overflow-hidden"
-            style={{
-              WebkitMaskImage: "linear-gradient(to right, black 65%, transparent 100%)",
-              maskImage: "linear-gradient(to right, black 65%, transparent 100%)",
-            }}
-          >
-            <span className="block font-inter text-sm font-medium whitespace-nowrap text-foreground/80">
-              {row.getValue("title")}
-            </span>
-          </div>
-        ),
-      },
-      {
-        accessorKey: "authorEmail",
-        header: "Autor",
-        cell: ({ row }) => (
-          <span className="font-inter text-xs text-muted-foreground">{row.getValue("authorEmail")}</span>
-        ),
-      },
-      {
-        accessorKey: "status",
-        header: "Status",
-        cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
-      },
-      {
-        accessorKey: "visibility",
-        header: "Visibilidade",
-        cell: ({ row }) => (
-          <span className="font-inter text-xs text-muted-foreground">
-            {row.getValue("visibility") === "public" ? "público" : "apenas alunos"}
-          </span>
-        ),
-      },
-      {
-        accessorKey: "updatedAt",
-        header: "Atualizado em",
-        cell: ({ row }) => (
-          <span className="font-inter text-xs text-muted-foreground">
-            {formatDate(row.getValue("updatedAt"))}
-          </span>
-        ),
-      },
-      {
-        id: "actions",
-        cell: ({ row }) => <ArticleRowActions article={row.original} />,
-      },
-    ],
-    []
+function PublishDialog({
+  open, onConfirm, onCancel, isLoading,
+}: { open: boolean; onConfirm: () => void; onCancel: () => void; isLoading: boolean }) {
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onCancel()}>
+      <DialogContent showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle>Publicar artigo</DialogTitle>
+          <DialogDescription>
+            O artigo será publicado imediatamente e ficará visível para os leitores conforme a configuração de visibilidade. Tem certeza?
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="ghost" disabled={isLoading}>Cancelar</Button>
+          </DialogClose>
+          <Button onClick={onConfirm} isLoading={isLoading}>Publicar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
+}
+
+function RejectDialog({
+  open, onConfirm, onCancel, isLoading,
+}: { open: boolean; onConfirm: () => void; onCancel: () => void; isLoading: boolean }) {
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onCancel()}>
+      <DialogContent showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle>Rejeitar artigo</DialogTitle>
+          <DialogDescription>
+            O artigo voltará ao status rejeitado. O autor poderá editá-lo e reenviar para revisão. Confirma?
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="ghost" disabled={isLoading}>Cancelar</Button>
+          </DialogClose>
+          <Button variant="destructive" onClick={onConfirm} isLoading={isLoading}>Rejeitar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function DeleteDialog({
+  open, onConfirm, onCancel, isLoading,
+}: { open: boolean; onConfirm: () => void; onCancel: () => void; isLoading: boolean }) {
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onCancel()}>
+      <DialogContent showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle>Excluir artigo</DialogTitle>
+          <DialogDescription>
+            Essa ação é permanente e não pode ser desfeita. O artigo será removido definitivamente.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="ghost" disabled={isLoading}>Cancelar</Button>
+          </DialogClose>
+          <Button variant="destructive" onClick={onConfirm} isLoading={isLoading}>Excluir</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+type RowActionsProps = {
+  article: AdminArticleItem;
+  onPublish: () => void;
+  onReject: () => void;
+  onDelete: () => void;
+};
+
+function ArticleRowActions({ article, onPublish, onReject, onDelete }: RowActionsProps) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="size-8">
+          <RiMoreLine className="size-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {article.status === "in_review" && (
+          <>
+            <DropdownMenuItem onClick={onPublish}>Publicar</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={onReject}>
+              Rejeitar
+            </DropdownMenuItem>
+          </>
+        )}
+        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={onDelete}>
+          Excluir
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+export function AdminArticlesView(props: AdminArticlesViewProps) {
+  const {
+    articles, isLoading, isError, refetch,
+    search, setSearch,
+    statusFilter, setStatusFilter,
+    totalCount,
+    publishConfirmId, setPublishConfirmId,
+    rejectConfirmId, setRejectConfirmId,
+    deleteConfirmId, setDeleteConfirmId,
+    onPublishConfirm, onRejectConfirm, onDeleteConfirm,
+    isPublishing, isRejecting, isDeleting,
+  } = props;
+
+  const columns = useMemo<ColumnDef<AdminArticleItem>[]>(() => [
+    {
+      accessorKey: "title",
+      header: "Título",
+      cell: ({ row }) => (
+        <div
+          className="max-w-72 overflow-hidden"
+          style={{
+            WebkitMaskImage: "linear-gradient(to right, black 65%, transparent 100%)",
+            maskImage: "linear-gradient(to right, black 65%, transparent 100%)",
+          }}
+        >
+          <span className="block font-inter text-sm font-medium whitespace-nowrap text-foreground/80">
+            {row.getValue("title")}
+          </span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
+    },
+    {
+      accessorKey: "visibility",
+      header: "Visibilidade",
+      cell: ({ row }) => (
+        <span className="font-inter text-xs text-muted-foreground">
+          {row.getValue("visibility") === "public" ? "público" : "apenas alunos"}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "updatedAt",
+      header: "Atualizado em",
+      cell: ({ row }) => (
+        <span className="font-inter text-xs text-muted-foreground">
+          {new Date(row.getValue("updatedAt")).toLocaleDateString("pt-BR")}
+        </span>
+      ),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <ArticleRowActions
+          article={row.original}
+          onPublish={() => setPublishConfirmId(row.original.articleId)}
+          onReject={() => setRejectConfirmId(row.original.articleId)}
+          onDelete={() => setDeleteConfirmId(row.original.articleId)}
+        />
+      ),
+    },
+  ], [setPublishConfirmId, setRejectConfirmId, setDeleteConfirmId]);
 
   const table = useReactTable({ data: articles, columns, getCoreRowModel: getCoreRowModel() });
+
+  const busyIds = new Set([publishConfirmId, rejectConfirmId, deleteConfirmId].filter(Boolean));
 
   return (
     <>
       <AnimateIn delay={0}>
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Input
-            placeholder="Buscar por título ou autor..."
+            placeholder="Buscar por título..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="max-w-72 font-inter text-sm"
@@ -168,7 +227,7 @@ export function AdminArticlesView() {
             {STATUS_FILTERS.map((s) => (
               <button
                 key={s}
-                onClick={() => setStatusFilter(s as StatusFilter)}
+                onClick={() => setStatusFilter(s as AdminArticleStatusFilter)}
                 className={`rounded-md px-3 py-1.5 font-inter text-xs transition-colors ${
                   statusFilter === s
                     ? "bg-primary/10 text-primary"
@@ -197,18 +256,31 @@ export function AdminArticlesView() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.length === 0 ? (
+              {isLoading ? (
+                <ArticleTableSkeleton />
+              ) : isError ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="py-12 text-center font-inter text-sm text-muted-foreground"
-                  >
+                  <TableCell colSpan={COL_COUNT} className="py-12 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <p className="font-inter text-sm text-muted-foreground">Erro ao carregar artigos.</p>
+                      <Button variant="outline" size="sm" onClick={refetch}>Tentar novamente</Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={COL_COUNT} className="py-12 text-center font-inter text-sm text-muted-foreground">
                     Nenhum artigo encontrado.
                   </TableCell>
                 </TableRow>
               ) : (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} className="border-border transition-colors hover:bg-muted/5">
+                  <TableRow
+                    key={row.id}
+                    className={`border-border transition-colors hover:bg-muted/5 ${
+                      busyIds.has(row.original.articleId) ? "pointer-events-none opacity-50" : ""
+                    }`}
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -220,14 +292,29 @@ export function AdminArticlesView() {
             </TableBody>
           </Table>
         </div>
-
-        <div className="mt-3 mb-12">
-          <p className="font-inter text-xs text-muted-foreground/50">
-            {articles.length} artigo{articles.length !== 1 ? "s" : ""} encontrado
-            {articles.length !== 1 ? "s" : ""}
-          </p>
-        </div>
+        <p className="mt-3 mb-12 font-inter text-xs text-muted-foreground/50">
+          {isLoading ? "Carregando..." : `${totalCount} artigo${totalCount !== 1 ? "s" : ""} no total`}
+        </p>
       </AnimateIn>
+
+      <PublishDialog
+        open={!!publishConfirmId}
+        onConfirm={onPublishConfirm}
+        onCancel={() => setPublishConfirmId(null)}
+        isLoading={isPublishing}
+      />
+      <RejectDialog
+        open={!!rejectConfirmId}
+        onConfirm={onRejectConfirm}
+        onCancel={() => setRejectConfirmId(null)}
+        isLoading={isRejecting}
+      />
+      <DeleteDialog
+        open={!!deleteConfirmId}
+        onConfirm={onDeleteConfirm}
+        onCancel={() => setDeleteConfirmId(null)}
+        isLoading={isDeleting}
+      />
     </>
   );
 }
