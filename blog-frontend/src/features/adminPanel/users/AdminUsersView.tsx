@@ -138,7 +138,7 @@ export function AdminUsersView(props: AdminUsersViewProps) {
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="size-8">
+            <Button variant="ghost" size="icon" className="size-8" aria-label="Abrir acoes do usuario">
               <RiMoreLine className="size-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -193,7 +193,7 @@ export function AdminUsersView(props: AdminUsersViewProps) {
                   <TableCell colSpan={4} className="py-12 text-center">
                     <div className="flex flex-col items-center gap-3">
                       <p className="font-inter text-sm text-muted-foreground">Erro ao carregar usuários.</p>
-                      <Button variant="outline" size="sm" onClick={refetch}>Tentar novamente</Button>
+                      <Button variant="outline" size="sm" onClick={() => void refetch()}>Tentar novamente</Button>
                     </div>
                   </TableCell>
                 </TableRow>

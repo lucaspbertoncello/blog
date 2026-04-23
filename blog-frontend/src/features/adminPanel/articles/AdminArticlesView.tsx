@@ -121,7 +121,7 @@ function ArticleRowActions({ article, onPublish, onReject, onDelete }: RowAction
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="size-8">
+        <Button variant="ghost" size="icon" className="size-8" aria-label="Abrir acoes do artigo">
           <RiMoreLine className="size-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -263,7 +263,7 @@ export function AdminArticlesView(props: AdminArticlesViewProps) {
                   <TableCell colSpan={COL_COUNT} className="py-12 text-center">
                     <div className="flex flex-col items-center gap-3">
                       <p className="font-inter text-sm text-muted-foreground">Erro ao carregar artigos.</p>
-                      <Button variant="outline" size="sm" onClick={refetch}>Tentar novamente</Button>
+                      <Button variant="outline" size="sm" onClick={() => void refetch()}>Tentar novamente</Button>
                     </div>
                   </TableCell>
                 </TableRow>
