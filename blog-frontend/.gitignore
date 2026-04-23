@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 .claude
 CLAUDE.md
+AGENTS.md
 .superpowers
 docs
 .env
