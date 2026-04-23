@@ -1,4 +1,4 @@
-import { QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { GetCommand } from "@aws-sdk/lib-dynamodb";
 import { lambdaHttpAdapter } from "../../adapters/lambdaHttpAdapter";
 import { Article } from "../../types/Article";
 import { dynamoClient } from "../../clients/dynamoClient";
@@ -12,22 +12,25 @@ export const handler = lambdaHttpAdapter<
   GetArticleBySlug.UrlParams
 >(
   async ({ params }) => {
-    const command = new QueryCommand({
+    const { Item: slugItem } = await dynamoClient.send(new GetCommand({
       TableName: process.env.TABLE_NAME,
-      IndexName: "GSI1",
-      KeyConditionExpression: "GSI1PK = :pk",
-      ExpressionAttributeValues: {
-        ":pk": `SLUG#${params.slug}`,
-      },
-    });
+      Key: { PK: `SLUG#${params.slug}`, SK: "INFO" },
+    }));
 
-    const { Items, Count } = await dynamoClient.send(command);
-
-    if (!Count || !Items) {
+    if (!slugItem) {
       throw new ApplicationError("Artigo não encontrado");
     }
 
-    const article = Items[0] as Article;
+    const { Item } = await dynamoClient.send(new GetCommand({
+      TableName: process.env.TABLE_NAME,
+      Key: { PK: `ARTICLE#${slugItem.articleId}`, SK: "INFO" },
+    }));
+
+    if (!Item) {
+      throw new ApplicationError("Artigo não encontrado");
+    }
+
+    const article = Item as Article;
 
     if (article.status !== "published") {
       throw new ApplicationError("Artigo não encontrado");

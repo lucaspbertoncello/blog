@@ -14,7 +14,7 @@ export function useArticleFilters({ articles }: UseArticleFiltersProps) {
   const filteredArticles = useMemo(() => {
     const searchLower = search.toLowerCase();
     return articles.filter((a) => {
-      const matchesSearch = a.title.toLowerCase().includes(searchLower);
+      const matchesSearch = a?.title?.toLowerCase().includes(searchLower);
       const matchesStatus = statusFilter === "all" || a.status === statusFilter;
       return matchesSearch && matchesStatus;
     });

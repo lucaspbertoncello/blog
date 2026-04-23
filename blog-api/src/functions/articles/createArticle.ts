@@ -1,10 +1,9 @@
-import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { TransactWriteCommand } from "@aws-sdk/lib-dynamodb";
 import { randomUUID } from "crypto";
 import { z } from "zod";
 import { lambdaHttpAdapter } from "../../adapters/lambdaHttpAdapter";
 import { dynamoClient } from "../../clients/dynamoClient";
 import { dynamoErrorMapper } from "../../errors/mappers/dynamoErrorMapper";
-import { ApplicationError } from "../../errors/ApplicationError";
 import { generateSlug } from "../../utils/generateSlug";
 
 const schema = z.object({
@@ -20,40 +19,44 @@ export const handler = lambdaHttpAdapter<"private", CreateArticle.Params, Create
     const now = new Date().toISOString();
     const slug = generateSlug(body.title);
 
-    const { Count } = await dynamoClient.send(new QueryCommand({
-      TableName: process.env.TABLE_NAME,
-      IndexName: "GSI1",
-      KeyConditionExpression: "GSI1PK = :pk",
-      ExpressionAttributeValues: { ":pk": `SLUG#${slug}` },
+    await dynamoClient.send(new TransactWriteCommand({
+      TransactItems: [
+        {
+          Put: {
+            TableName: process.env.TABLE_NAME,
+            Item: {
+              PK: `ARTICLE#${articleId}`,
+              SK: "INFO",
+              GSI1PK: `ACCOUNT#${accountId}`,
+              GSI1SK: `ARTICLE#${articleId}`,
+              GSI2PK: "ARTICLES",
+              GSI2SK: `STATUS#draft#CREATED_AT#${now}`,
+              articleId,
+              accountId,
+              title: body.title,
+              content: body.content,
+              tags: body.tags,
+              slug,
+              status: "draft",
+              visibility: body.visibility,
+              createdAt: now,
+              updatedAt: now,
+            },
+          },
+        },
+        {
+          Put: {
+            TableName: process.env.TABLE_NAME,
+            Item: {
+              PK: `SLUG#${slug}`,
+              SK: "INFO",
+              articleId,
+            },
+            ConditionExpression: "attribute_not_exists(PK)",
+          },
+        },
+      ],
     }));
-
-    if (Count) {
-      throw new ApplicationError("Já existe um artigo com esse título");
-    }
-
-    const command = new PutCommand({
-      TableName: process.env.TABLE_NAME,
-      Item: {
-        PK: `ARTICLE#${articleId}`,
-        SK: "INFO",
-        GSI1PK: `SLUG#${slug}`,
-        GSI1SK: `ARTICLE#${articleId}`,
-        GSI2PK: `ARTICLES`,
-        GSI2SK: `STATUS#draft#CREATED_AT#${now}`,
-        articleId,
-        accountId,
-        title: body.title,
-        content: body.content,
-        tags: body.tags,
-        slug,
-        status: "draft",
-        visibility: body.visibility,
-        createdAt: now,
-        updatedAt: now,
-      },
-    });
-
-    await dynamoClient.send(command);
 
     return {
       statusCode: 201,

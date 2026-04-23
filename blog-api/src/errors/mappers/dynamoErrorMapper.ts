@@ -3,6 +3,14 @@ import { ApplicationError } from "../ApplicationError";
 export function dynamoErrorMapper(err: unknown): ApplicationError {
   if (err instanceof Error) {
     switch (err.name) {
+      case "TransactionCanceledException": {
+        const reasons = (err as any).CancellationReasons ?? [];
+        const isSlugConflict = reasons.some((r: any) => r.Code === "ConditionalCheckFailed");
+        return isSlugConflict
+          ? new ApplicationError("Já existe um artigo com esse título")
+          : new ApplicationError("Conflito ao processar a operação. Tente novamente");
+      }
+
       case "ConditionalCheckFailedException":
         return new ApplicationError("Operação não permitida: condição não satisfeita");
 

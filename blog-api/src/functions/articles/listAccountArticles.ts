@@ -32,12 +32,11 @@ export const handler = lambdaHttpAdapter<
     const { Items, Count } = await dynamoClient.send(
       new QueryCommand({
         TableName: process.env.TABLE_NAME,
-        IndexName: "GSI2",
-        KeyConditionExpression: "GSI2PK = :pk",
-        FilterExpression: "accountId = :accountId",
+        IndexName: "GSI1",
+        KeyConditionExpression: "GSI1PK = :pk AND begins_with(GSI1SK, :prefix)",
         ExpressionAttributeValues: {
-          ":pk": "ARTICLES",
-          ":accountId": targetAccountId,
+          ":pk": `ACCOUNT#${targetAccountId}`,
+          ":prefix": "ARTICLE#",
         },
         ProjectionExpression: "articleId, title, #status, slug, visibility, tags, content, createdAt, updatedAt",
         ExpressionAttributeNames: {

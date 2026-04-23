@@ -1,4 +1,4 @@
-import { GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { GetCommand, TransactWriteCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
 import { lambdaHttpAdapter } from "../../adapters/lambdaHttpAdapter";
 import { dynamoClient } from "../../clients/dynamoClient";
@@ -31,22 +31,58 @@ export const handler = lambdaHttpAdapter<"private", EditArticle.Params, void, Ed
     }
 
     const title = body.title ?? Item.title;
-    const slug = generateSlug(title);
+    const newSlug = generateSlug(title);
+    const oldSlug = Item.slug as string;
+    const slugChanged = newSlug !== oldSlug;
+    const now = new Date().toISOString();
 
-    await dynamoClient.send(new UpdateCommand({
-      TableName: process.env.TABLE_NAME,
-      Key: { PK: `ARTICLE#${articleId}`, SK: "INFO" },
-      UpdateExpression: "SET title = :title, slug = :slug, GSI1PK = :gsi1pk, content = :content, tags = :tags, visibility = :visibility, updatedAt = :updatedAt",
-      ExpressionAttributeValues: {
-        ":title":      title,
-        ":slug":       slug,
-        ":gsi1pk":     `SLUG#${slug}`,
-        ":content":    body.content    ?? Item.content,
-        ":tags":       body.tags       ?? Item.tags,
-        ":visibility": body.visibility ?? Item.visibility,
-        ":updatedAt":  new Date().toISOString(),
-      },
-    }));
+    if (slugChanged) {
+      await dynamoClient.send(new TransactWriteCommand({
+        TransactItems: [
+          {
+            Delete: {
+              TableName: process.env.TABLE_NAME,
+              Key: { PK: `SLUG#${oldSlug}`, SK: "INFO" },
+            },
+          },
+          {
+            Put: {
+              TableName: process.env.TABLE_NAME,
+              Item: { PK: `SLUG#${newSlug}`, SK: "INFO", articleId },
+              ConditionExpression: "attribute_not_exists(PK)",
+            },
+          },
+          {
+            Update: {
+              TableName: process.env.TABLE_NAME,
+              Key: { PK: `ARTICLE#${articleId}`, SK: "INFO" },
+              UpdateExpression: "SET title = :title, slug = :slug, content = :content, tags = :tags, visibility = :visibility, updatedAt = :updatedAt",
+              ExpressionAttributeValues: {
+                ":title":      title,
+                ":slug":       newSlug,
+                ":content":    body.content    ?? Item.content,
+                ":tags":       body.tags       ?? Item.tags,
+                ":visibility": body.visibility ?? Item.visibility,
+                ":updatedAt":  now,
+              },
+            },
+          },
+        ],
+      }));
+    } else {
+      await dynamoClient.send(new UpdateCommand({
+        TableName: process.env.TABLE_NAME,
+        Key: { PK: `ARTICLE#${articleId}`, SK: "INFO" },
+        UpdateExpression: "SET title = :title, content = :content, tags = :tags, visibility = :visibility, updatedAt = :updatedAt",
+        ExpressionAttributeValues: {
+          ":title":      title,
+          ":content":    body.content    ?? Item.content,
+          ":tags":       body.tags       ?? Item.tags,
+          ":visibility": body.visibility ?? Item.visibility,
+          ":updatedAt":  now,
+        },
+      }));
+    }
 
     return { statusCode: 200 };
   },

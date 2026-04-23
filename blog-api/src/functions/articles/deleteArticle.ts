@@ -36,7 +36,10 @@ export const handler = lambdaHttpAdapter<"private", undefined, void, DeleteArtic
       }),
     );
 
-    const items = allItems ?? [];
+    const items = [
+      ...(allItems ?? []),
+      { PK: `SLUG#${Item.slug}`, SK: "INFO" },
+    ];
 
     for (let i = 0; i < items.length; i += 25) {
       await dynamoClient.send(
