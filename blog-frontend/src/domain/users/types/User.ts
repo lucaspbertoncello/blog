@@ -1,7 +1,7 @@
 export type User = {
   accountId: string;
   email: string;
-  active: true;
+  active: boolean;
   role: UserRoles;
   createdAt: string;
   updatedAt: string;
