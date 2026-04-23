@@ -49,6 +49,7 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
             - dynamodb:BatchWriteItem
+            - dynamodb:TransactWriteItems
           Resource:
             - !GetAtt MainTable.Arn
             - !Sub "${MainTable.Arn}/index/*"
