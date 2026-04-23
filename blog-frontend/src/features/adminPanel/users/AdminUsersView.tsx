@@ -16,10 +16,10 @@ import { Input } from "@/shared/components/common/input";
 import { Skeleton } from "@/shared/components/common/skeleton";
 import { AnimateIn } from "@/shared/components/custom/AnimateIn";
 import { RiMoreLine } from "@remixicon/react";
-import type { useAdminUsersModel } from "./AdminUsersModel";
-import type { User, UserRoles } from "./AdminUsersModel";
+import type { useAdminUsersSection } from "../hooks/useAdminUsersSection";
+import type { User, UserRoles } from "../hooks/useAdminUsersSection";
 
-export type AdminUsersViewProps = ReturnType<typeof useAdminUsersModel>;
+export type AdminUsersViewProps = ReturnType<typeof useAdminUsersSection>;
 
 const ROLE_VARIANTS: Record<UserRoles, string> = {
   admin: "bg-primary/10 text-primary border-primary/20",

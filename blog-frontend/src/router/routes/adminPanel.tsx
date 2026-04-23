@@ -1,7 +1,6 @@
 import { createRoute, redirect } from "@tanstack/react-router";
 import { adminPanelLayoutRoute } from "../layouts";
-import { AdminArticlesViewModel } from "@/features/adminPanel/articles/AdminArticlesViewModel";
-import { AdminUsersViewModel } from "@/features/adminPanel/users/AdminUsersViewModel";
+import { AdminPanelViewModel } from "@/features/adminPanel/AdminPanelViewModel";
 
 export const adminIndexRoute = createRoute({
   getParentRoute: () => adminPanelLayoutRoute,
@@ -14,11 +13,11 @@ export const adminIndexRoute = createRoute({
 export const adminArticlesRoute = createRoute({
   getParentRoute: () => adminPanelLayoutRoute,
   path: "/admin/articles",
-  component: AdminArticlesViewModel,
+  component: AdminPanelViewModel,
 });
 
 export const adminUsersRoute = createRoute({
   getParentRoute: () => adminPanelLayoutRoute,
   path: "/admin/users",
-  component: AdminUsersViewModel,
+  component: AdminPanelViewModel,
 });

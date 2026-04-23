@@ -18,10 +18,10 @@ import { AnimateIn } from "@/shared/components/custom/AnimateIn";
 import { StatusBadge } from "@/features/articlesPanel/components/StatusBadge";
 import { STATUS_LABELS, STATUS_FILTERS } from "@/features/articlesPanel/constants";
 import { RiMoreLine } from "@remixicon/react";
-import type { useAdminArticlesModel } from "./AdminArticlesModel";
-import type { AdminArticleItem, AdminArticleStatusFilter } from "./AdminArticlesModel";
+import type { useAdminArticlesSection } from "../hooks/useAdminArticlesSection";
+import type { AdminArticleItem, AdminArticleStatusFilter } from "../hooks/useAdminArticlesSection";
 
-export type AdminArticlesViewProps = ReturnType<typeof useAdminArticlesModel>;
+export type AdminArticlesViewProps = ReturnType<typeof useAdminArticlesSection>;
 
 const COL_COUNT = 5;
 
