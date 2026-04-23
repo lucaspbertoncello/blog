@@ -1,13 +1,14 @@
 import { AnimateIn } from "@/shared/components/custom/AnimateIn";
+import { Button } from "@/shared/components/common/button";
 import { MarkdownRenderer } from "@/shared/components/custom/MarkdownRenderer";
 import { cn, formatDate } from "@/shared/lib/utils";
 import { Link } from "@tanstack/react-router";
 import {
   RiArrowLeftLine,
   RiCalendarLine,
-  RiChat3Line,
   RiHeartFill,
   RiHeartLine,
+  RiSendPlaneLine,
   RiTimeLine,
 } from "@remixicon/react";
 import { LoadingState } from "./components/states/LoadingState";
@@ -115,10 +116,6 @@ export function ArticlePageView(props: ArticlePageViewProps) {
                 {like.likedByMe ? <RiHeartFill className="size-3.5" /> : <RiHeartLine className="size-3.5" />}
                 {like.likesCount}
               </button>
-              <span className="flex items-center gap-1.5 font-inter text-xs text-muted-foreground/30">
-                <RiChat3Line className="size-3.5" />
-                {comments.commentsCountLabel}
-              </span>
             </div>
           </AnimateIn>
 
@@ -151,6 +148,7 @@ export function ArticlePageView(props: ArticlePageViewProps) {
                 </div>
               ) : comments.isLoadingComments ? (
                 <div className="mt-6 space-y-4">
+                  <CommentForm comments={comments} />
                   <div className="space-y-2 border-l border-border pl-4">
                     <div className="h-3 w-28 animate-pulse rounded-full bg-muted" />
                     <div className="h-4 w-full animate-pulse rounded-full bg-muted" />
@@ -162,11 +160,15 @@ export function ArticlePageView(props: ArticlePageViewProps) {
                   </div>
                 </div>
               ) : comments.comments.length === 0 ? (
-                <p className="mt-6 font-inter text-sm text-muted-foreground/60">
-                  Nenhum comentário publicado ainda.
-                </p>
+                <div className="mt-6 space-y-5">
+                  <CommentForm comments={comments} />
+                  <p className="font-inter text-sm text-muted-foreground/60">
+                    Nenhum comentário publicado ainda.
+                  </p>
+                </div>
               ) : (
                 <div className="mt-6 space-y-5">
+                  <CommentForm comments={comments} />
                   {comments.comments.map((comment) => (
                     <article key={comment.commentId} className="border-l border-border pl-4">
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -209,5 +211,44 @@ export function ArticlePageView(props: ArticlePageViewProps) {
         </article>
       )}
     </div>
+  );
+}
+
+type CommentFormProps = {
+  comments: ArticlePageViewProps["comments"];
+};
+
+function CommentForm({ comments }: CommentFormProps) {
+  return (
+    <form
+      className="border-l border-border pl-4"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void comments.onSubmitComment();
+      }}
+    >
+      <label htmlFor="article-comment" className="sr-only">
+        Escrever comentário
+      </label>
+      <textarea
+        id="article-comment"
+        value={comments.commentText}
+        disabled={comments.isCreatingComment}
+        onChange={(event) => comments.setCommentText(event.target.value)}
+        placeholder="Escreva um comentário"
+        className="min-h-28 w-full resize-y rounded-2xl border border-input bg-input/30 px-4 py-3 font-inter text-sm leading-6 text-foreground transition-colors outline-none placeholder:text-muted-foreground/40 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+      />
+      <div className="mt-3 flex justify-end">
+        <Button
+          type="submit"
+          size="sm"
+          isLoading={comments.isCreatingComment}
+          disabled={!comments.canSubmitComment}
+        >
+          <RiSendPlaneLine className="size-3.5" />
+          comentar
+        </Button>
+      </div>
+    </form>
   );
 }
